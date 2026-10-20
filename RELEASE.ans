@@ -70,6 +70,7 @@
 [38;5;238m|: [38;5;252mCost .......... TQ = Toffolis x peak qubits                               [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mFormat ........ every stream + grade receipt, every method                [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mPaper ......... paper/HereLiesScarlet_I_Did_Not_Read_the_README.pdf       [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mDOI ........... 10.5281/zenodo.23486661                                   [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mLicense ....... CC BY 4.0 (circuits, paper), MIT (verifier)               [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mDate .......... 19 Oct 2026                                               [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mCracked by .... HereLiesScarlet (Michael David Brown), Lafayette          [38;5;238m :|[0m
@@ -548,6 +549,7 @@
 [38;5;238m|: [38;5;252m              arXiv:2610.22367 on All Eight Tasks, Under Its              [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m              Own Grader and a Stricter One},                             [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m    year   = {2026},                                                      [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m    doi    = {10.5281/zenodo.23486661},                                   [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m    url    = {https://github.com/HereLiesRepo/Here-Lies-Space-Time},         [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m    note   = {Graded OK by the authors' own grader}}                      [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m

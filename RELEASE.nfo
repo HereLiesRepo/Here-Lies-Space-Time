@@ -70,6 +70,7 @@
 |: Cost .......... TQ = Toffolis x peak qubits                                :|
 |: Format ........ every stream + grade receipt, every method                 :|
 |: Paper ......... paper/HereLiesScarlet_I_Did_Not_Read_the_README.pdf        :|
+|: DOI ........... 10.5281/zenodo.23486661                                    :|
 |: License ....... CC BY 4.0 (circuits, paper), MIT (verifier)                :|
 |: Date .......... 19 Oct 2026                                                :|
 |: Cracked by .... HereLiesScarlet (Michael David Brown), Lafayette           :|
@@ -548,6 +549,7 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 |:               arXiv:2610.22367 on All Eight Tasks, Under Its               :|
 |:               Own Grader and a Stricter One},                              :|
 |:     year   = {2026},                                                       :|
+|:     doi    = {10.5281/zenodo.23486661},                                    :|
 |:     url    = {https://github.com/HereLiesRepo/Here-Lies-Space-Time},          :|
 |:     note   = {Graded OK by the authors' own grader}}                       :|
 |:                                                                            :|
