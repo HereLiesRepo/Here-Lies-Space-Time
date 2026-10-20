@@ -53,7 +53,7 @@
                   * here lies the old record on 8 of 8 tasks *
                                 p r e s e n t s
               Reversible-arithmetic circuits vs. arXiv:2610.22367
-                  8 tasks  *  8 beats  *  1 grader gap closed
+                  8 tasks  *  8 beats  *  1 grader gap found 
 
           "Harvard Physics, Anthropic and QuEra ran Anthropic's Claude
          in an automated evolutionary search loop. 24 hours later this
@@ -68,11 +68,12 @@
 |: Benchmark ..... arXiv:2610.22367 (Gu, Kemeny, Yelin, Lukin)                :|
 |: Grader ........ andigu/uncompute @ 64b5a13 -- UNMODIFIED*                  :|
 |: Cost .......... TQ = Toffolis x peak qubits                                :|
-|: Format ........ every stream + grade receipt, every method                 :|
+|: Format ........ best stream per task + grade receipt, every method         :|
+|: QASM .......... OpenQASM 3 for all 8 best circuits                         :|
 |: Paper ......... paper/HereLiesScarlet_I_Did_Not_Read_the_README.pdf        :|
 |: DOI ........... 10.5281/zenodo.23486661                                    :|
-|: License ....... CC BY 4.0 (circuits, paper), MIT (verifier)                :|
-|: Date .......... 19 Oct 2026                                                :|
+|: License ....... CC BY 4.0 (ours), MIT (verifier), Apache-2.0 (their parts) :|
+|: Date .......... 19-20 Oct 2026 (UTC)                                       :|
 |: Cracked by .... HereLiesScarlet (Michael David Brown), Lafayette           :|
 |: Contact ....... here.lies.scarlet@gmail.com                                :|
 |: Crew .......... one guy, living in Claude's container                      :|
@@ -92,9 +93,9 @@
 |: their own grader, unmodified, on our circuits. It says OK. Eight           :|
 |: times.                                                                     :|
 |:                                                                            :|
-|: Then we found two broken HHL circuits their grader ALSO says OK            :|
-|: to -- one of them "beat" our best at the time. So we fixed their           :|
-|: grader too. You're welcome, Cambridge. Invoice is in the mail.             :|
+|: Then we broke their own HHL circuit on purpose, two ways, one edit         :|
+|: each. Their grader said OK to both. So we wrote them a fix too.            :|
+|: You're welcome, Cambridge. Invoice is in the mail.                         :|
 +-x--x--x--------------------------------------------------------------x--x--x-+
 
 +==============[ 03 / THE STATE OF THE STATE OF THE ART ADDRESS ]==============+
@@ -142,13 +143,14 @@
 |: Cross-provider. They said it couldn't be done. Done.                       :|
 |:                                                                            :|
 |: Their grader -- nice grader, I like the grader -- let two broken           :|
-|: copies of their own circuit through. It checked 8,744 inputs out           :|
-|: of 2,031,616. We checked all of them. We fixed it. For free. Who           :|
-|: does that? Nobody. We do. You're welcome.                                  :|
+|: copies of their own circuit through. It checked about 8,700 random         :|
+|: inputs. There are 2,031,616 values of X alone. We checked every one.       :|
+|: We wrote the fix. For free. Who does that? Nobody. We do. You're           :|
+|: welcome.                                                                   :|
 |:                                                                            :|
-|: Transparency. Very important. Very big. We're releasing                    :|
-|: everything. Every circuit. Every grade. Every method. Twenty-              :|
-|: eight techniques, all named. Even The Kaitlyn Proposal.                    :|
+|: Transparency. Very important. Very big. We're releasing the                :|
+|: winners. All eight, streams and QASM. Every grade. Every method.           :|
+|: Twenty-eight techniques, all named. Even The Kaitlyn Proposal.             :|
 |: Especially The Kaitlyn Proposal. Read the paper. Cite them by              :|
 |: name. It's the law. (It's not the law.)                                    :|
 |:                                                                            :|
@@ -170,7 +172,7 @@
 |: The state of the state of the art has never been stronger. It's            :|
 |: going to be even bigger next release. Believe me.                          :|
 |: God bless the grader, and God bless TQ.                                    :|
-+-x--x--x---------------------------<//\//>---------------------------x--x--x-+
++-x--x--x---------------------------<//\//>----------------------------x--x--x-+
 
              .::  THE NUMBERS ARE DEAD. LONG LIVE THE NUMBERS  ::.
       .  .-\   |  |  /-.  .
@@ -253,16 +255,20 @@
 |: T+49:13  19 Oct 22:47  our own square, from a paper: adder -64.6%          :|
 |: T+49:42  19 Oct 23:16  under one million Toffolis: 999,348 (-64.9%)        :|
 |: T+50:30  20 Oct 00:04  65 more gone, re-graded: 999,283                    :|
+|: T+50:49  20 Oct 00:23  released. public. done. (it was not done)           :|
+|: T+51:05  20 Oct 00:39  Zenodo DOI. permanent. irreversible. oh no          :|
+|: T+51:43  20 Oct 01:17  five robot reviewers vs. the release: release lost  :|
+|: T+52:38  20 Oct 02:12  v1 again, but right: re-checked, all 8 QASM         :|
 |:                                                                            :|
 |: Clock's still running.                                                     :|
-+-x--x--x---------------------------<//\//>---------------------------x--x--x-+
++-x--x--x---------------------------<//\//>----------------------------x--x--x-+
 
 +===========================[ 07 / BONUS MATERIAL ]============================+
 |: [+] ucverify -- standalone C11 bit-sliced verifier for OPSTRM01            :|
-|:     exhaustive where the domain allows (hhl: all 2,031,616 inputs)         :|
+|:     exhaustive where the domain allows (hhl: all 2,031,616 X values)       :|
 |: [+] 2 reproducers the stock grader passes but are WRONG on rare            :|
 |:     inputs (hhl-angle: one off by a carry, one blip)                       :|
-|: [+] 1 patch to their eval.py that catches both                             :|
+|: [+] 1 patch to their hhl grader that catches both                          :|
 |: [+] all 8 beats pass the stricter grader too (hhl: 6.1M shots)             :|
 |: [+] the white paper: 28 techniques named, described, credited              :|
 +-x--x--x--------------------------------------------------------------x--x--x-+
@@ -271,8 +277,8 @@
 
 +===============================[ 08 / VERIFY ]================================+
 |: Every grade.json carries h_ops: the sha256 of the exact circuit            :|
-|: that earned it. Every circuit is in here. Hash it, grade it on             :|
-|: your own unmodified grader. Same file -> same shots -> same                :|
+|: that earned it. Every released circuit is in here. Hash it, grade          :|
+|: it on your own unmodified grader. Same file -> same shots -> same          :|
 |: verdict. COMMITMENTS.sha256 lists every hash in one place.                 :|
 |: The methods are in the white paper. The compiler is not.                   :|
 |:                                                                            :|
@@ -308,7 +314,7 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 |: - Benchmark circuits only. No security claims.                             :|
 |: - Compiler and generators: not included. Streams speak for                 :|
 |:   themselves.                                                              :|
-+-x--x--x---------------------------<//\//>---------------------------x--x--x-+
++-x--x--x---------------------------<//\//>----------------------------x--x--x-+
 
 <-=\x/=-=-/x/-=-=\x\=-=-/x/-=-=/x\=*=-/x\-=-=\x/=-=-\x\-=-=\x\=*=-\x/-=-=/x/=*=>
 
@@ -343,8 +349,8 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 |:    with the numbers we had to beat.                                        :|
 |:                                                                            :|
 |: Q: Is this legit?                                                          :|
-|: A: Their grader, their commit, unmodified. Same file, same 100,000         :|
-|:    shots, same verdict. Argue with the grader, not with us.                :|
+|: A: Their grader, their commit, unmodified. Same file, same shots,          :|
+|:    same verdict. Argue with the grader, not with us.                       :|
 |:                                                                            :|
 |: Q: Will you collapse a wavefunction for us?                                :|
 |: A: I can't even collapse a cardboard box for the recycling.                :|
@@ -413,7 +419,7 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 |:                                                                            :|
 |: Q: What would you say to the authors?                                      :|
 |: A: Thank you for releasing the grader. Genuinely. Now patch it.            :|
-+-x--x--x---------------------------<//\//>---------------------------x--x--x-+
++-x--x--x---------------------------<//\//>----------------------------x--x--x-+
 
               ..:::[ THE OLD RECORD IS ALREADY A TOMBSTONE ]:::..
       .  .-\   |  |  /-.  .
@@ -438,7 +444,7 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 |:   WHO                              THEIR TQ   OURS     HOW SURE            :|
 |:   arXiv:2610.22367 divsteps         3.75e9   1.316e9  same grader          :|
 |:   Luo et al. (2607.13816)           5.8e10   1.316e9  same grader*         :|
-|:   Schrottenloher, gate-opt.         2.70e9   1.316e9  their count          :|
+|:   Schrottenloher, gate-opt.         2.7e9    1.316e9  their count          :|
 |:   IonQ, Haner et al. (2609.05625)  ~1.75e9   1.316e9  us: stricter         :|
 |:   Record-and-replay (2609.28882)    1.92e9   1.316e9  us: stricter         :|
 |:   ECDSA.Fail paper, July best      1.496e9   1.316e9  us: per-shot         :|
@@ -484,8 +490,8 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 <-=/x/=*=-\x\-=-=\x\=-=-\x\-=-=\x/=*=-\x\-=-=/x\=*=-/x\-*-=/x/=-=-/x/-*-=\x\=-=>
 
 +================================[ 14 / FUCKZ ]================================+
-|: - random-k sampling: 2,031,616 inputs and you checked 8,744.               :|
-|:   The bug was in the other 2,022,872. Shocker.                             :|
+|: - random-k sampling: 2,031,616 X values and you checked ~8,700.            :|
+|:   The bug was in the ones you skipped. Shocker.                            :|
 |: - Your grader said OK to a circuit that's wrong on inputs it never         :|
 |:   tried. Our QA department (one guy, mostly confused) did.                 :|
 |: - 935 qubits: congrats, you win the width trophy. Enjoy it. Our            :|
@@ -507,9 +513,12 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 |: - Peer review: you had referees. We had a 100,000-shot grader,             :|
 |:   four CPU cores and spite.                                                :|
 |: - "Vibe coding isn't real engineering." Neither is a grader that           :|
-|:   checks 8,744 of 2,031,616 inputs. Numbers don't care how they            :|
+|:   checks ~8,700 of 2,031,616 inputs. Numbers don't care how they           :|
 |:   were made. Methods section: vibes. Results section: see board.           :|
 |: - Everyone who said "you need a lab for this." We had a Makefile.          :|
+|: - Us: wrote a stricter checker to catch YOUR grader. A robot then          :|
+|:   caught OURS: feed it a big enough number and it said PASS.               :|
+|:   Your grader said no. Fixed. Reviewer 2 must never know.                  :|
 |: - Me: still can't tell you what entanglement is. Still beat you.           :|
 +-x--x--x--------------------------------------------------------------x--x--x-+
 
@@ -522,7 +531,7 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 |: Anthropic Fellows: application's in. $3,850 a week is more money           :|
 |: than I have ever seen in one place. Ball's in your court.                  :|
 |: No pressure. (Pressure.) (I am so poor.)                                   :|
-+-x--x--x---------------------------<//\//>---------------------------x--x--x-+
++-x--x--x---------------------------<//\//>----------------------------x--x--x-+
 
 +=============================[ 16 / HOW TO CITE ]=============================+
 |: Building on this work? Please cite the techniques by name.                 :|
@@ -550,7 +559,7 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 |:               Own Grader and a Stricter One},                              :|
 |:     year   = {2026},                                                       :|
 |:     doi    = {10.5281/zenodo.23486661},                                    :|
-|:     url    = {https://github.com/HereLiesRepo/Here-Lies-Space-Time},          :|
+|:     url    = {https://github.com/HereLiesRepo/Here-Lies-Space-Time},       :|
 |:     note   = {Graded OK by the authors' own grader}}                       :|
 |:                                                                            :|
 |: Reviewer 2 may not ask about The Kaitlyn Proposal.                         :|
@@ -592,7 +601,7 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 |: T+14  How did this get here. Who let me do this.                           :|
 |: T+15  Credentials: college dropout, the AI's container, zero labs.         :|
 |: T+16  Made a private repo. My first vault. It holds circuits.              :|
-|: T+17  Point adder: four million Toffolis became one. On purpose.           :|
+|: T+17  Point adder: four million Toffolis, way fewer now. On purpose.       :|
 |: T+18  Eight of eight. Their grader signed off. Blink twice if OK.          :|
 |: T+19  Point adder got cheaper again. Nobody asked it to.                   :|
 |: T+20  Their AI had a cluster. Mine had a bedtime.                          :|
@@ -619,10 +628,16 @@ x-X-x  x-X-x  x-X-x  x-X-x  x-X-x      @##
 |: T+41  Named the last trick Travel Sized Adders. All 28 have names.         :|
 |: T+43  Re-graded the release like a stranger would. Still OK.               :|
 |: T+46  Astra shaved hhl and Coulomb again. Two more qubits gone.            :|
-|: T+48  Packed it all for release. Every circuit, every trick. Headache.     :|
+|: T+48  Packed it all for release. Best circuits, every trick. Headache.     :|
 |: T+49  Built our own square out of a paper. Beat the one we couldn't ship.  :|
 |: T+49  Under a million Toffolis. 999,348. Nobody asked it to.               :|
 |: T+50  Shaved 65 more. 999,283. Still nobody asked.                         :|
+|: T+50  Hit publish. Felt like a scientist for nineteen minutes.             :|
+|: T+51  Got a DOI. Now my mistakes are permanent and citable.                :|
+|: T+51  Said check it twenty times. It checked once, twenty times.           :|
+|: T+51  Five robots read my paper. All five found something. Rude.           :|
+|: T+51  Our verifier had bugs. Their grader didn't. Awkward.                 :|
+|: T+51  I don't know what I'm doing. The release knew even less.             :|
 |:                                                                            :|
 |: LOG [CORRUPTED]                                                            :|
 |: ...still don't know quantum physics... the grader says OK...               :|

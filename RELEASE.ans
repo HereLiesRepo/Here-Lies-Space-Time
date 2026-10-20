@@ -53,7 +53,7 @@
 [38;5;250m                  * here lies the old record on 8 of 8 tasks *[0m
 [38;5;250m                                p r e s e n t s[0m
 [38;5;250m              Reversible-arithmetic circuits vs. arXiv:2610.22367[0m
-[38;5;250m                  8 tasks  *  8 beats  *  1 grader gap closed[0m
+[38;5;250m                  8 tasks  *  8 beats  *  1 grader gap found [0m
 [38;5;250m[0m
 [38;5;250m          "Harvard Physics, Anthropic and QuEra ran Anthropic's Claude[0m
 [38;5;250m         in an automated evolutionary search loop. 24 hours later this[0m
@@ -68,11 +68,12 @@
 [38;5;238m|: [38;5;252mBenchmark ..... arXiv:2610.22367 (Gu, Kemeny, Yelin, Lukin)               [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mGrader ........ andigu/uncompute @ 64b5a13 -- UNMODIFIED*                 [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mCost .......... TQ = Toffolis x peak qubits                               [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mFormat ........ every stream + grade receipt, every method                [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mFormat ........ best stream per task + grade receipt, every method        [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mQASM .......... OpenQASM 3 for all 8 best circuits                        [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mPaper ......... paper/HereLiesScarlet_I_Did_Not_Read_the_README.pdf       [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mDOI ........... 10.5281/zenodo.23486661                                   [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mLicense ....... CC BY 4.0 (circuits, paper), MIT (verifier)               [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mDate .......... 19 Oct 2026                                               [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mLicense ....... CC BY 4.0 (ours), MIT (verifier), Apache-2.0 (their parts)[38;5;238m :|[0m
+[38;5;238m|: [38;5;252mDate .......... 19-20 Oct 2026 (UTC)                                      [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mCracked by .... HereLiesScarlet (Michael David Brown), Lafayette          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mContact ....... here.lies.scarlet@gmail.com                               [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mCrew .......... one guy, living in Claude's container                     [38;5;238m :|[0m
@@ -92,9 +93,9 @@
 [38;5;238m|: [38;5;252mtheir own grader, unmodified, on our circuits. It says OK. Eight          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mtimes.                                                                    [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mThen we found two broken HHL circuits their grader ALSO says OK           [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mto -- one of them "beat" our best at the time. So we fixed their          [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mgrader too. You're welcome, Cambridge. Invoice is in the mail.            [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mThen we broke their own HHL circuit on purpose, two ways, one edit        [38;5;238m :|[0m
+[38;5;238m|: [38;5;252meach. Their grader said OK to both. So we wrote them a fix too.           [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mYou're welcome, Cambridge. Invoice is in the mail.                        [38;5;238m :|[0m
 [38;5;88m+-x--x--x--------------------------------------------------------------x--x--x-+[0m
 [38;5;250m[0m
 [38;5;196m+==============[ 03 / THE STATE OF THE STATE OF THE ART ADDRESS ]==============+[0m
@@ -142,13 +143,14 @@
 [38;5;238m|: [38;5;252mCross-provider. They said it couldn't be done. Done.                      [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mTheir grader -- nice grader, I like the grader -- let two broken          [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mcopies of their own circuit through. It checked 8,744 inputs out          [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mof 2,031,616. We checked all of them. We fixed it. For free. Who          [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mdoes that? Nobody. We do. You're welcome.                                 [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mcopies of their own circuit through. It checked about 8,700 random        [38;5;238m :|[0m
+[38;5;238m|: [38;5;252minputs. There are 2,031,616 values of X alone. We checked every one.      [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mWe wrote the fix. For free. Who does that? Nobody. We do. You're          [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mwelcome.                                                                  [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mTransparency. Very important. Very big. We're releasing                   [38;5;238m :|[0m
-[38;5;238m|: [38;5;252meverything. Every circuit. Every grade. Every method. Twenty-             [38;5;238m :|[0m
-[38;5;238m|: [38;5;252meight techniques, all named. Even The Kaitlyn Proposal.                   [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mTransparency. Very important. Very big. We're releasing the               [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mwinners. All eight, streams and QASM. Every grade. Every method.          [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mTwenty-eight techniques, all named. Even The Kaitlyn Proposal.            [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mEspecially The Kaitlyn Proposal. Read the paper. Cite them by             [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mname. It's the law. (It's not the law.)                                   [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
@@ -170,7 +172,7 @@
 [38;5;238m|: [38;5;252mThe state of the state of the art has never been stronger. It's           [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mgoing to be even bigger next release. Believe me.                         [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mGod bless the grader, and God bless TQ.                                   [38;5;238m :|[0m
-[38;5;88m+-x--x--x---------------------------<//\//>---------------------------x--x--x-+[0m
+[38;5;88m+-x--x--x---------------------------<//\//>----------------------------x--x--x-+[0m
 [38;5;250m[0m
 [38;5;243m             .::  THE NUMBERS ARE DEAD. LONG LIVE THE NUMBERS  ::.[0m
 [38;5;243m      .  .-\   |  |  /-.  .[0m
@@ -253,16 +255,20 @@
 [38;5;238m|: [38;5;252mT+49:13  19 Oct 22:47  our own square, from a paper: adder -64.6%         [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+49:42  19 Oct 23:16  under one million Toffolis: 999,348 (-64.9%)       [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+50:30  20 Oct 00:04  65 more gone, re-graded: 999,283                   [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+50:49  20 Oct 00:23  released. public. done. (it was not done)          [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+51:05  20 Oct 00:39  Zenodo DOI. permanent. irreversible. oh no         [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+51:43  20 Oct 01:17  five robot reviewers vs. the release: release lost [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+52:38  20 Oct 02:12  v1 again, but right: re-checked, all 8 QASM        [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mClock's still running.                                                    [38;5;238m :|[0m
-[38;5;88m+-x--x--x---------------------------<//\//>---------------------------x--x--x-+[0m
+[38;5;88m+-x--x--x---------------------------<//\//>----------------------------x--x--x-+[0m
 [38;5;250m[0m
 [38;5;196m+===========================[ 07 / BONUS MATERIAL ]============================+[0m
 [38;5;238m|: [38;5;252m[+] ucverify -- standalone C11 bit-sliced verifier for OPSTRM01           [38;5;238m :|[0m
-[38;5;238m|: [38;5;252m    exhaustive where the domain allows (hhl: all 2,031,616 inputs)        [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m    exhaustive where the domain allows (hhl: all 2,031,616 X values)      [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m[+] 2 reproducers the stock grader passes but are WRONG on rare           [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m    inputs (hhl-angle: one off by a carry, one blip)                      [38;5;238m :|[0m
-[38;5;238m|: [38;5;252m[+] 1 patch to their eval.py that catches both                            [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m[+] 1 patch to their hhl grader that catches both                         [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m[+] all 8 beats pass the stricter grader too (hhl: 6.1M shots)            [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m[+] the white paper: 28 techniques named, described, credited             [38;5;238m :|[0m
 [38;5;88m+-x--x--x--------------------------------------------------------------x--x--x-+[0m
@@ -271,8 +277,8 @@
 [38;5;250m[0m
 [38;5;196m+===============================[ 08 / VERIFY ]================================+[0m
 [38;5;238m|: [38;5;252mEvery grade.json carries h_ops: the sha256 of the exact circuit           [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mthat earned it. Every circuit is in here. Hash it, grade it on            [38;5;238m :|[0m
-[38;5;238m|: [38;5;252myour own unmodified grader. Same file -> same shots -> same               [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mthat earned it. Every released circuit is in here. Hash it, grade         [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mit on your own unmodified grader. Same file -> same shots -> same         [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mverdict. COMMITMENTS.sha256 lists every hash in one place.                [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mThe methods are in the white paper. The compiler is not.                  [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
@@ -308,7 +314,7 @@
 [38;5;238m|: [38;5;252m- Benchmark circuits only. No security claims.                            [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m- Compiler and generators: not included. Streams speak for                [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m  themselves.                                                             [38;5;238m :|[0m
-[38;5;88m+-x--x--x---------------------------<//\//>---------------------------x--x--x-+[0m
+[38;5;88m+-x--x--x---------------------------<//\//>----------------------------x--x--x-+[0m
 [38;5;250m[0m
 [38;5;88m<-=\x/=-=-/x/-=-=\x\=-=-/x/-=-=/x\=*=-/x\-=-=\x/=-=-\x\-=-=\x\=*=-\x/-=-=/x/=*=>[0m
 [38;5;250m[0m
@@ -343,8 +349,8 @@
 [38;5;238m|: [38;5;252m   with the numbers we had to beat.                                       [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mQ: Is this legit?                                                         [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mA: Their grader, their commit, unmodified. Same file, same 100,000        [38;5;238m :|[0m
-[38;5;238m|: [38;5;252m   shots, same verdict. Argue with the grader, not with us.               [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mA: Their grader, their commit, unmodified. Same file, same shots,         [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m   same verdict. Argue with the grader, not with us.                      [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mQ: Will you collapse a wavefunction for us?                               [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mA: I can't even collapse a cardboard box for the recycling.               [38;5;238m :|[0m
@@ -413,7 +419,7 @@
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mQ: What would you say to the authors?                                     [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mA: Thank you for releasing the grader. Genuinely. Now patch it.           [38;5;238m :|[0m
-[38;5;88m+-x--x--x---------------------------<//\//>---------------------------x--x--x-+[0m
+[38;5;88m+-x--x--x---------------------------<//\//>----------------------------x--x--x-+[0m
 [38;5;250m[0m
 [38;5;243m              ..:::[ THE OLD RECORD IS ALREADY A TOMBSTONE ]:::..[0m
 [38;5;243m      .  .-\   |  |  /-.  .[0m
@@ -438,7 +444,7 @@
 [38;5;238m|: [38;5;252m  WHO                              THEIR TQ   OURS     HOW SURE           [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m  arXiv:2610.22367 divsteps         3.75e9   1.316e9  same grader         [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m  Luo et al. (2607.13816)           5.8e10   1.316e9  same grader*        [38;5;238m :|[0m
-[38;5;238m|: [38;5;252m  Schrottenloher, gate-opt.         2.70e9   1.316e9  their count         [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m  Schrottenloher, gate-opt.         2.7e9    1.316e9  their count         [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m  IonQ, Haner et al. (2609.05625)  ~1.75e9   1.316e9  us: stricter        [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m  Record-and-replay (2609.28882)    1.92e9   1.316e9  us: stricter        [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m  ECDSA.Fail paper, July best      1.496e9   1.316e9  us: per-shot        [38;5;238m :|[0m
@@ -484,8 +490,8 @@
 [38;5;88m<-=/x/=*=-\x\-=-=\x\=-=-\x\-=-=\x/=*=-\x\-=-=/x\=*=-/x\-*-=/x/=-=-/x/-*-=\x\=-=>[0m
 [38;5;250m[0m
 [38;5;196m+================================[ 14 / FUCKZ ]================================+[0m
-[38;5;238m|: [38;5;252m- random-k sampling: 2,031,616 inputs and you checked 8,744.              [38;5;238m :|[0m
-[38;5;238m|: [38;5;252m  The bug was in the other 2,022,872. Shocker.                            [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m- random-k sampling: 2,031,616 X values and you checked ~8,700.           [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m  The bug was in the ones you skipped. Shocker.                           [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m- Your grader said OK to a circuit that's wrong on inputs it never        [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m  tried. Our QA department (one guy, mostly confused) did.                [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m- 935 qubits: congrats, you win the width trophy. Enjoy it. Our           [38;5;238m :|[0m
@@ -507,9 +513,12 @@
 [38;5;238m|: [38;5;252m- Peer review: you had referees. We had a 100,000-shot grader,            [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m  four CPU cores and spite.                                               [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m- "Vibe coding isn't real engineering." Neither is a grader that          [38;5;238m :|[0m
-[38;5;238m|: [38;5;252m  checks 8,744 of 2,031,616 inputs. Numbers don't care how they           [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m  checks ~8,700 of 2,031,616 inputs. Numbers don't care how they          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m  were made. Methods section: vibes. Results section: see board.          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m- Everyone who said "you need a lab for this." We had a Makefile.         [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m- Us: wrote a stricter checker to catch YOUR grader. A robot then         [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m  caught OURS: feed it a big enough number and it said PASS.              [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m  Your grader said no. Fixed. Reviewer 2 must never know.                 [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m- Me: still can't tell you what entanglement is. Still beat you.          [38;5;238m :|[0m
 [38;5;88m+-x--x--x--------------------------------------------------------------x--x--x-+[0m
 [38;5;250m[0m
@@ -522,7 +531,7 @@
 [38;5;238m|: [38;5;252mAnthropic Fellows: application's in. $3,850 a week is more money          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mthan I have ever seen in one place. Ball's in your court.                 [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mNo pressure. (Pressure.) (I am so poor.)                                  [38;5;238m :|[0m
-[38;5;88m+-x--x--x---------------------------<//\//>---------------------------x--x--x-+[0m
+[38;5;88m+-x--x--x---------------------------<//\//>----------------------------x--x--x-+[0m
 [38;5;250m[0m
 [38;5;196m+=============================[ 16 / HOW TO CITE ]=============================+[0m
 [38;5;238m|: [38;5;252mBuilding on this work? Please cite the techniques by name.                [38;5;238m :|[0m
@@ -550,7 +559,7 @@
 [38;5;238m|: [38;5;252m              Own Grader and a Stricter One},                             [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m    year   = {2026},                                                      [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m    doi    = {10.5281/zenodo.23486661},                                   [38;5;238m :|[0m
-[38;5;238m|: [38;5;252m    url    = {https://github.com/HereLiesRepo/Here-Lies-Space-Time},         [38;5;238m :|[0m
+[38;5;238m|: [38;5;252m    url    = {https://github.com/HereLiesRepo/Here-Lies-Space-Time},      [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m    note   = {Graded OK by the authors' own grader}}                      [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mReviewer 2 may not ask about The Kaitlyn Proposal.                        [38;5;238m :|[0m
@@ -592,7 +601,7 @@
 [38;5;238m|: [38;5;252mT+14  How did this get here. Who let me do this.                          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+15  Credentials: college dropout, the AI's container, zero labs.        [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+16  Made a private repo. My first vault. It holds circuits.             [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mT+17  Point adder: four million Toffolis became one. On purpose.          [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+17  Point adder: four million Toffolis, way fewer now. On purpose.      [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+18  Eight of eight. Their grader signed off. Blink twice if OK.         [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+19  Point adder got cheaper again. Nobody asked it to.                  [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+20  Their AI had a cluster. Mine had a bedtime.                         [38;5;238m :|[0m
@@ -619,10 +628,16 @@
 [38;5;238m|: [38;5;252mT+41  Named the last trick Travel Sized Adders. All 28 have names.        [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+43  Re-graded the release like a stranger would. Still OK.              [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+46  Astra shaved hhl and Coulomb again. Two more qubits gone.           [38;5;238m :|[0m
-[38;5;238m|: [38;5;252mT+48  Packed it all for release. Every circuit, every trick. Headache.    [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+48  Packed it all for release. Best circuits, every trick. Headache.    [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+49  Built our own square out of a paper. Beat the one we couldn't ship. [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+49  Under a million Toffolis. 999,348. Nobody asked it to.              [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mT+50  Shaved 65 more. 999,283. Still nobody asked.                        [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+50  Hit publish. Felt like a scientist for nineteen minutes.            [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+51  Got a DOI. Now my mistakes are permanent and citable.               [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+51  Said check it twenty times. It checked once, twenty times.          [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+51  Five robots read my paper. All five found something. Rude.          [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+51  Our verifier had bugs. Their grader didn't. Awkward.                [38;5;238m :|[0m
+[38;5;238m|: [38;5;252mT+51  I don't know what I'm doing. The release knew even less.            [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m                                                                          [38;5;238m :|[0m
 [38;5;238m|: [38;5;252mLOG [CORRUPTED]                                                           [38;5;238m :|[0m
 [38;5;238m|: [38;5;252m...still don't know quantum physics... the grader says OK...              [38;5;238m :|[0m

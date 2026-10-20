@@ -1,8 +1,53 @@
-== blip zero
-equiv mode=zero draws=860 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=0 dirty_reset_lanes=0 k_out_differs_from_baseline=0 clean=1
-== blip xormix
-equiv mode=xormix draws=860 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=0 dirty_reset_lanes=0 k_out_differs_from_baseline=2 clean=0
-== blip splitmix:1
-equiv mode=splitmix:1 draws=860 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=0 dirty_reset_lanes=0 k_out_differs_from_baseline=0 clean=1
-== blip splitmix:5
-equiv mode=splitmix:5 draws=860 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=0 dirty_reset_lanes=0 k_out_differs_from_baseline=0 clean=1
+# ucverify check hhl-angle stream.ops --strict --list 1000000
+# (stream.ops = xz -dc stream.ops.xz); exhaustive over all 2,031,616 in-domain X for each of 45 k patterns
+# cross-check: ucverify check hhl-angle <authors' circuit.ops> --strict --drop CX:9170 lists the identical 609 lanes
+{"h_ops": "4b6d1d9ba17b8779c8301fffe2dd870f7b4af356a902efaa792aa49ecefc4e53", "metrics": {"toffoli": 1348, "clifford": 56418, "qubits": 115, "outcomes": 1040, "bits": 0, "ops": 58976, "tq_cost": 155020}}
+# per k pattern: failing lanes (wrong_output / wrong_sign_const / outcome-dependent sign / dirty)
+zero failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+ones failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+xormix failed=2 wrong_output=2 wrong_sign_const=0 outdep=0 dirty=0
+splitmix:1 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+splitmix:5 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+random:1 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+random:2 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+random:3 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+random:4 failed=1 wrong_output=1 wrong_sign_const=0 outdep=0 dirty=0
+kneg:0 failed=152 wrong_output=152 wrong_sign_const=0 outdep=0 dirty=0
+kneg:65535 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:65536 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:131071 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:131072 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:262143 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:262144 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:524287 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:524288 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:1048575 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:1048576 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:2097151 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:2097152 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:4194303 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:4194304 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:8388607 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:8388608 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:16777215 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:16777216 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:33554431 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:33554432 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:67108863 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:67108864 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:134217727 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:134217728 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:268435455 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:268435456 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:536870911 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:536870912 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:1073741823 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:1073741824 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:2147483647 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:2147483648 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:4294967295 failed=151 wrong_output=151 wrong_sign_const=0 outdep=0 dirty=0
+kneg:4294967296 failed=152 wrong_output=152 wrong_sign_const=0 outdep=0 dirty=0
+kneg:8589934591 failed=151 wrong_output=151 wrong_sign_const=0 outdep=0 dirty=0
+{"verdict": "FAIL"}
+# ucverify ref hhl-angle on every listed lane (long-double asinl oracle):
+# lanes 609, outside the 429-unit band 609, f64 and long-double f(X) disagree on 0

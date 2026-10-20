@@ -1,0 +1,21 @@
+--- a/tasks/hhl-angle/circuits/discovered/circuit.py
++++ b/tasks/hhl-angle/circuits/discovered/circuit.py
+@@ -441,7 +441,7 @@
+         with b.phase(f"product/t{t}"):
+             cxs, s1w, m1w, signw = prod_row_spec(t)
+             m, n = VW - SIG[t] + 1, 33 - B4[t]
+-            brow(cxs, s1w, m1w, signw, prod_pairs(t), KQ[B4[t] :], row_gl(m, n))
++            brow(cxs, s1w, m1w, signw, prod_pairs(t), (KQ[B4[t] : 30] if t == 0 else KQ[B4[t] :]), row_gl(m, n))
+     with b.phase("product/close"):
+         for q in KQ:
+             b.x(q)
+--- a/tasks/hhl-angle/circuits/discovered/meta.json
++++ b/tasks/hhl-angle/circuits/discovered/meta.json
+@@ -1,6 +1,6 @@
+ {
+  "expected": {
+-  "toffoli": 1348,
++  "toffoli": 1345,
+   "qubits": 115
+  },
+  "registers": [
