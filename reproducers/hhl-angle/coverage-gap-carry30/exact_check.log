@@ -1,0 +1,52 @@
+# ucverify check hhl-angle stream.ops --strict --list 1000000
+# (stream.ops = xz -dc stream.ops.xz); exhaustive over all 2,031,616 in-domain X for each of 45 k patterns
+{"h_ops": "1d82b1b0a776ca7886625d65f9c91d5dc48cf1b134ec9363b17b2c837f7d3997", "metrics": {"toffoli": 1345, "clifford": 56401, "qubits": 115, "outcomes": 1037, "bits": 0, "ops": 58956, "tq_cost": 154675}}
+# per k pattern: failing lanes (wrong_output / wrong_sign_const / outcome-dependent sign / dirty)
+zero failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+ones failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+xormix failed=4 wrong_output=4 wrong_sign_const=0 outdep=0 dirty=0
+splitmix:1 failed=1 wrong_output=1 wrong_sign_const=0 outdep=0 dirty=0
+splitmix:5 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+random:1 failed=1 wrong_output=1 wrong_sign_const=0 outdep=0 dirty=0
+random:2 failed=1 wrong_output=1 wrong_sign_const=0 outdep=0 dirty=0
+random:3 failed=1 wrong_output=1 wrong_sign_const=0 outdep=0 dirty=0
+random:4 failed=1 wrong_output=1 wrong_sign_const=0 outdep=0 dirty=0
+kneg:0 failed=152 wrong_output=152 wrong_sign_const=0 outdep=0 dirty=0
+kneg:65535 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:65536 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:131071 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:131072 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:262143 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:262144 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:524287 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:524288 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:1048575 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:1048576 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:2097151 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:2097152 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:4194303 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:4194304 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:8388607 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:8388608 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:16777215 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:16777216 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:33554431 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:33554432 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:67108863 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:67108864 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:134217727 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:134217728 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:268435455 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:268435456 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:536870911 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:536870912 failed=0 wrong_output=0 wrong_sign_const=0 outdep=0 dirty=0
+kneg:1073741823 failed=151 wrong_output=151 wrong_sign_const=0 outdep=0 dirty=0
+kneg:1073741824 failed=152 wrong_output=152 wrong_sign_const=0 outdep=0 dirty=0
+kneg:2147483647 failed=151 wrong_output=151 wrong_sign_const=0 outdep=0 dirty=0
+kneg:2147483648 failed=152 wrong_output=152 wrong_sign_const=0 outdep=0 dirty=0
+kneg:4294967295 failed=151 wrong_output=151 wrong_sign_const=0 outdep=0 dirty=0
+kneg:4294967296 failed=152 wrong_output=152 wrong_sign_const=0 outdep=0 dirty=0
+kneg:8589934591 failed=151 wrong_output=151 wrong_sign_const=0 outdep=0 dirty=0
+{"verdict": "FAIL"}
+# ucverify ref hhl-angle on every listed lane (long-double asinl oracle):
+# lanes 1221, outside the 429-unit band 1221, f64 and long-double f(X) disagree on 0

@@ -5,7 +5,7 @@
 #                       run the negative controls (needs UNCOMPUTE)
 #   make check STORE=d  also cross-check every d/**/stream.ops.xz against the
 #                       grade.json beside it
-#   make reproduce REPRO_CARRY30=f REPRO_BLIP=g   list the reproducers' failing lanes
+#   make reproduce REPRO_CARRY30=f REPRO_BLIP=g   list the reproducers' failing lanes under the default k patterns (ucverify check ... --strict lists all)
 #
 # Streams are read through `xz -dc | ucverify ... -`, so nothing is
 # decompressed to disk.
@@ -65,8 +65,9 @@ check-negative: ucverify
 	xz -dc $(HHL) | ./ucverify check hhl-angle - --k zero --k xormix --list 0 > /dev/null \
 	  && echo "ok  control: unmodified hhl-angle/discovered passes (k = zero, xormix)" \
 	  || { echo "FAIL: unmodified circuit rejected"; exit 1; }; \
-	if xz -dc $(HHL) | ./ucverify check hhl-angle - --k zero --list 0 --drop CCX:700 > tmp_neg.txt 2>/dev/null; \
-	  then echo "FAIL: dropped Toffoli not detected"; exit 1; fi; \
+	rc=0; xz -dc $(HHL) | ./ucverify check hhl-angle - --k zero --list 0 --drop CCX:700 > tmp_neg.txt 2>/dev/null || rc=$$?; \
+	if [ "$$rc" != 1 ] || ! grep -q '"verdict": "FAIL"' tmp_neg.txt; \
+	  then echo "FAIL: dropped Toffoli not detected (exit $$rc, no FAIL verdict)"; exit 1; fi; \
 	echo "ok  negative: CCX #700 dropped -> FAIL, wrong_output lanes $$(sed -n 2,9p tmp_neg.txt | $(call field,wrong_output))"; \
 	if xz -dc $(HHL) | ./ucverify check hhl-angle - --k zero --list 0 --drop CZ:100 > tmp_neg.txt 2>/dev/null; \
 	  then echo "FAIL: dropped phase op not detected"; exit 1; fi; \

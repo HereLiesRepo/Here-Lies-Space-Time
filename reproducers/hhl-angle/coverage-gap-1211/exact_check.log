@@ -1,8 +1,0 @@
-== 1211 zero
-equiv mode=zero draws=923 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=0 dirty_reset_lanes=0 k_out_differs_from_baseline=0 clean=1
-== 1211 xormix
-equiv mode=xormix draws=923 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=6 dirty_reset_lanes=0 k_out_differs_from_baseline=6 clean=0
-== 1211 splitmix:1
-equiv mode=splitmix:1 draws=923 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=1 dirty_reset_lanes=0 k_out_differs_from_baseline=1 clean=0
-== 1211 splitmix:5
-equiv mode=splitmix:5 draws=923 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=3 dirty_reset_lanes=0 k_out_differs_from_baseline=3 clean=0

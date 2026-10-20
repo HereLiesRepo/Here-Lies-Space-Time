@@ -20,6 +20,8 @@ This package contains:
 | `README.md` | this file |
 | `GAP_REPORT.md` | a test-coverage gap in the hhl-angle grader, with reproducers |
 | `uncompute_hhl_k_coverage.patch` | a proposed grader change for hhl-angle |
+| `lanes_carry30.txt`, `lanes_blip.txt` | every failing (X, k) lane of the two hhl-angle reproducers (`reproducers/`) |
+| `LICENSE` | MIT, for `ucverify.c`, the `Makefile` and `reproducers/tools/opsdrop.c` |
 
 ## Build
 

@@ -6,11 +6,11 @@ White paper: https://doi.org/10.5281/zenodo.23486661 (Zenodo, DOI 10.5281/zenodo
 
 Quantum circuits (op streams, OpenQASM 3 and grade receipts) that score below the circuits of arXiv:2610.22367 (A. Gu, A. H. Kemeny, S. F. Yelin, M. D. Lukin) on all eight of its tasks. Grader: `andigu/uncompute` at commit `64b5a13aa249f1360846657392e6c66817b26d0f`, unmodified.
 
-This repository holds the best circuit for each task, a second point adder built only from published techniques, their grade receipts, the white paper (`paper/`) and a standalone C verifier (`verifier/`). It holds no generator code.
+This repository holds the best circuit for each task, a second point adder built only from published techniques, their grade receipts, the white paper (`paper/`), a standalone C verifier (`verifier/`), and two deliberately broken versions of the authors' `hhl-angle` circuit that the stock grader accepts (`reproducers/`, with the one-line generator edit and the op-removal tool that make them). It holds no generator code for our circuits.
 
 ## Results
 
-TQ-cost is the Toffoli count times the peak qubit count, as the grader defines it. "Paper" is the circuit labelled `discovered` in the grader's `tasks/<task>/circuits/`. All numbers are as the grader printed them (`grade.json`). The change column is `(this TQ / paper TQ) - 1`, computed here.
+TQ-cost is the Toffoli count times the peak qubit count, as the grader defines it. "Paper" is the circuit the grader's task README lists as discovered, in `tasks/<task>/circuits/` (for `modinv-point-add`, `divsteps`). All numbers are as the grader printed them (`grade.json`). The change column is `(this TQ / paper TQ) - 1`, computed here.
 
 | task | Toffoli | qubits | TQ-cost | failed shots (limit) | paper Toffoli | paper qubits | paper TQ-cost | TQ change |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -24,7 +24,7 @@ TQ-cost is the Toffoli count times the peak qubit count, as the grader defines i
 | `modinv-point-add` | 999,283 | 1,317 | 1,316,055,711 | 7 (20 of 100,000) | 4,006,673 | 935 | 3,746,239,255 | -64.87% |
 | `modinv-point-add` (published techniques only, `published/`) | 1,498,991 | 1,505 | 2,255,981,455 | 0 (20 of 100,000) | 4,006,673 | 935 | 3,746,239,255 | -39.78% |
 
-Scope: these results are under arXiv:2610.22367's grader (every Toffoli billed on every shot, at most 2e-4 failures). The ECDSA.Fail benchmark scores differently (average billing of classically-conditioned Toffolis, submitter-chosen test inputs, zero failures on 9,024 shots); its leader scores lower under those rules, and our streams are not records there.
+Scope: these results are under arXiv:2610.22367's grader (every Toffoli billed on every shot; failed shots within each task's limit: 20 of 100,000 for `modinv-point-add`, 100 of 100,000 for the two DQI tasks, none for the rest). The ECDSA.Fail benchmark scores differently (average billing of classically-conditioned Toffolis, submitter-chosen test inputs, zero failures on 9,024 shots); its leader scores lower under those rules, and our streams are not records there.
 
 Every row has verdict `OK` in its `grade.json`, and the SHA-256 of the raw op stream equals the `h_ops` in that file.
 
@@ -44,32 +44,32 @@ Only `modinv-point-add` is a different construction from the paper's circuit. Th
 |---|---|
 | `hhl-angle` | A rewrite of the authors' released circuit, checked exhaustively over every input X in the task's domain under several structured accumulator patterns. Methods: see the white paper. |
 | `gaussian` | A rewrite of the authors' released circuit. Methods: see the white paper. |
-| `coulomb-potential` | A rewrite of the authors' released circuit, checked exhaustively over all 2^24 inputs. Methods: see the white paper. |
+| `coulomb-potential` | A rewrite of the authors' released circuit, checked with `verifier/ucverify` over every one of the 2^24 values of r_j for each of four fixed r_i. Methods: see the white paper. |
 | `chemistry-fe2s2` | A rewrite of the authors' released circuit (19 more qubits, fewer Toffolis). Methods: see the white paper. |
 | `dqi-hermitian` | A rewrite of the authors' released circuit. Methods: see the white paper. |
-| `dqi-reed-solomon` | The authors' released circuit with 354 Toffolis removed, each proven not to change the state for any input. |
+| `dqi-reed-solomon` | The authors' released circuit with 354 fewer Toffolis: selected Toffolis replaced, then high wire ids relocated into wires that are zero at that point (CREDITS.md, the white paper). |
 | `lattice-gauge-plaquette` | A rewrite of the authors' released circuit. Methods: see the white paper. |
 | `modinv-point-add` | An independent construction: a ping-pong dialog-GCD point adder built with our own compiler (prior work credited in CREDITS.md). Every sub-square of its Karatsuba squares is an exact square written from the controlled add-subtract and schoolbook description of Litinski, arXiv:2410.00899, with each row's carry-in made from X gates (X + Y + 1 = ~(~X + ~Y)). Compiler not published; methods in the white paper. |
 | `modinv-point-add/published` | A second point adder built only from published techniques (ECDSA.Fail's ping-pong division and six-stage addition, Gidney's adders), released so that anyone can grade it. |
 
 ## Failure margins
 
-The point adder's `grade.json` shows `wrong_output_shots` 7, `wrong_sign_shots` 3 and `dirty_qubits` 387 with `failed_shots` 7 and verdict `OK`; the limit is 20 failed shots in 100,000. On a held-out set of 100,000 inputs drawn from an independent seed it fails on 8 inputs, the same 8 that the earlier versions it was built from fail there. `dqi-hermitian` fails 59 and `dqi-reed-solomon` 8 of a limit of 100. A sampled pass is evidence, not proof.
+The point adder's `grade.json` shows `wrong_output_shots` 7, `wrong_sign_shots` 3 and `dirty_qubits` 387 with `failed_shots` 7 and verdict `OK`; the limit is 20 failed shots in 100,000. On a held-out set of 100,000 inputs drawn from an independent seed it fails on 8 inputs, the same 8 on which the earlier variant it was built from fails. `dqi-hermitian` fails 59 and `dqi-reed-solomon` 8 of a limit of 100. A sampled pass is evidence, not proof.
 
 ## Verify a result
 
-You need `andigu/uncompute` at `64b5a13`. From its root, with its environment set up (the C kernel is optional and gives identical results):
+You need `andigu/uncompute` at `64b5a13`, with its environment set up (the C kernel, `make kernel`, is optional and gives identical results). With `<release>` this repository's root and `<task>` one of the eight task names:
 
 ```
-cd circuits/<task>
+cd <release>/circuits/<task>          # for the published adder: circuits/modinv-point-add/published, task modinv-point-add
 sha256sum -c SHA256SUMS
-xz -dc stream.ops.xz > s.ops
-sha256sum s.ops                      # must equal "h_ops" in grade.json
+xz -dc stream.ops.xz > ~/s.ops
+sha256sum ~/s.ops                  # must equal "h_ops" in grade.json
 cd <path to andigu/uncompute>
-python tools/eval.py <task> --ops <path>/s.ops --json
+python tools/eval.py <task> --ops ~/s.ops --json
 ```
 
-The JSON printed should equal `grade.json` except for the `timing` field. A `modinv-point-add` grade takes about ten minutes on four cores.
+The JSON printed should equal `grade.json` except for the `timing` field. A `modinv-point-add` grade takes about 90 seconds with the grader's compiled C kernel (`make kernel` in the grader), and roughly 10 to 20 minutes on four cores with its pure-Python reference executor.
 
 To check every stored stream against its `grade.json` without Python, and to re-run the verifier's controls on the authors' circuits:
 
@@ -94,23 +94,24 @@ Each `circuits/<task>/` holds:
 | file | content |
 |---|---|
 | `stream.ops.xz` | the OPSTRM01 op stream, compressed with `xz` |
-| `circuit.qasm.xz` | the same circuit as OpenQASM 3, compressed with `xz` |
+| `circuit.qasm.xz` | the same circuit as OpenQASM 3, compressed with `xz` (for the two DQI tasks: `circuit.qasm.xz.part-*` and `QASM_JOINED.sha256`, see below) |
 | `grade.json` | the grader's `--json` output, copied unchanged |
+| `patched_grade.json` | `hhl-angle` only: the output of the grader with `verifier/uncompute_hhl_k_coverage.patch` applied |
 | `SHA256SUMS` | SHA-256 of the files above (`sha256sum -c`) |
 
 | entry | `stream.ops.xz` | `circuit.qasm.xz` | `grade.json` | raw `h_ops` (SHA-256 of the decompressed stream) |
 |---|---:|---:|---:|---|
-| `hhl-angle` | 39,744 | 36,384 | 389 | `2c59af9e93cd947ee7734d731a87039cc9a12561f0e122f071531a9508455985` |
+| `hhl-angle` | 39,744 | 36,384 | 396 | `2c59af9e93cd947ee7734d731a87039cc9a12561f0e122f071531a9508455985` |
 | `gaussian` | 21,932 | 31,900 | 397 | `c9ca88774d4849c7b61601ab7629606f86fced2b15a9bed528b5880845582ad1` |
-| `coulomb-potential` | 13,120 | 16,412 | 387 | `35295aa5d6aaa9861cae195959b8baebf1f9b40ee26c39416fdcace068c3cbe3` |
+| `coulomb-potential` | 13,120 | 16,412 | 394 | `35295aa5d6aaa9861cae195959b8baebf1f9b40ee26c39416fdcace068c3cbe3` |
 | `chemistry-fe2s2` | 334,532 | 513,976 | 405 | `fe4ba65050aa999d365f793885f5b6af530813b90e5125e2caeff9e116c79501` |
-| `dqi-hermitian` | 1,221,260 | not stored | 416 | `5d58460db308fcce019abe9a1c6336e1391e032b9cf4ab5a33c23986363f6860` |
-| `dqi-reed-solomon` | 15,611,632 | not stored | 414 | `15be73a0ab99d4ac4694e2aa9bff31d0ac9be5dfd3abd68854be5e56bd44466b` |
+| `dqi-hermitian` | 1,221,260 | 144,239,364 in 4 parts | 416 | `5d58460db308fcce019abe9a1c6336e1391e032b9cf4ab5a33c23986363f6860` |
+| `dqi-reed-solomon` | 15,611,632 | 76,425,180 in 2 parts | 414 | `15be73a0ab99d4ac4694e2aa9bff31d0ac9be5dfd3abd68854be5e56bd44466b` |
 | `lattice-gauge-plaquette` | 128,460 | 223,512 | 409 | `291fb64deb732c0a2bb25b7f98d8a03b2ecec4eff3f40b8ffd8eeaac0cbdfc13` |
 | `modinv-point-add` | 5,126,240 | 6,923,536 | 417 | `394a96b03e0e05c1627340912a1292ed1cfe835b48d04733967d5f6f5e057b42` |
-| `modinv-point-add/published` | 2,941,648 | not stored | 416 | `88be2e5777494671e2227d274ce9cc710348b75e0c7557adc36b8e8c41d9e714` |
+| `modinv-point-add/published` | 2,941,648 | 2,749,276 | 416 | `88be2e5777494671e2227d274ce9cc710348b75e0c7557adc36b8e8c41d9e714` |
 
-Sizes are in bytes. QASM is not stored for `dqi-hermitian` and `dqi-reed-solomon` (several GB uncompressed) or for the published-techniques adder.
+Sizes are in bytes. The `dqi-hermitian` and `dqi-reed-solomon` QASM files are larger than the 50 MB per file GitHub recommends even compressed (144 MB and 76 MB), so they are stored as numbered parts of at most 48 MB: join them with `cat circuit.qasm.xz.part-* > circuit.qasm.xz` and check the result against `QASM_JOINED.sha256`. Uncompressed they are several GB.
 
 ## The OpenQASM files
 
@@ -134,7 +135,15 @@ As in the grader, a bit-conditioned CX or CZ is billed as a Toffoli, and a bit-c
 
 ## License
 
-The circuits, grade receipts, OpenQASM files and the paper are released under CC BY 4.0 (`LICENSE`): reuse them freely with credit to Michael David Brown (HereLiesScarlet). `verifier/ucverify.c` and its Makefile are MIT (`verifier/LICENSE`). `verifier/uncompute_hhl_k_coverage.patch` is a change to `andigu/uncompute`, which is Apache-2.0, and is offered under that project's license.
+Our circuits, grade receipts, OpenQASM files and the paper are released under CC BY 4.0 (`LICENSE`): reuse them freely with credit to Michael David Brown (HereLiesScarlet). `verifier/ucverify.c`, its Makefile and `reproducers/tools/opsdrop.c` are MIT (`verifier/LICENSE`).
+
+Modified Apache-2.0 material. The grader repository `andigu/uncompute` is licensed under the Apache License 2.0; its text is in `LICENSE-APACHE`. These files are modified versions of circuits or code from that repository, and are marked here as changed:
+
+- the streams for `chemistry-fe2s2`, `coulomb-potential`, `dqi-hermitian`, `dqi-reed-solomon`, `gaussian`, `hhl-angle` and `lattice-gauge-plaquette` (each modifies the authors' circuit for that task; the changes are described in the white paper), and their OpenQASM exports;
+- the two streams in `reproducers/hhl-angle/` and `reproducers/tools/carry30_circuit.diff` (one-place edits of the authors' `hhl-angle` circuit, described in `reproducers/README.md`);
+- `verifier/uncompute_hhl_k_coverage.patch` (a change to the grader's `tasks/hhl-angle` files).
+
+The original parts remain under Apache-2.0. Our changes are offered under CC BY 4.0, except the patch, which is offered under Apache-2.0 so it can be applied to the grader as is. The `modinv-point-add` streams are independent constructions and are not derived from the authors' circuits.
 
 ## Not included
 

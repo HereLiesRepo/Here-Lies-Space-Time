@@ -28,13 +28,13 @@ Source for this table: the division-provenance review we carried out. Items that
 ## Function-evaluation tasks (`hhl-angle`, `gaussian`, `coulomb-potential`)
 
 - Baseline in the task READMEs: T. Haner, M. Roetteler, K. M. Svore, "Optimizing quantum circuits for arithmetic", arXiv:1805.12445 (2018).
-- The streams here are edits of the paper authors' released circuits (`circuits/discovered` in the grader). The edits are listed in the README.
+- The streams here are edits of the paper authors' released circuits (`tasks/<task>/circuits/discovered` in the grader). The edits are described in the white paper.
 
 ## Other tasks
 
 - `chemistry-fe2s2`: baseline `babbush-composed` in the grader. The stream here is an edit of the authors' discovered circuit (restructured lookup stage, then a further stream rewrite).
 - `lattice-gauge-plaquette`: baseline `osorio-composed` in the grader. The stream here is an edit of the authors' discovered circuit.
-- `dqi-hermitian`: baseline `sakata-fengrao` in the grader (Sakata, Jensen and Hoholdt, 1995). The stream here is the authors' discovered circuit with the walk rebuilt and other edits listed in the README.
+- `dqi-hermitian`: baseline `sakata-fengrao` in the grader (Sakata, Jensen and Hoholdt, 1995). The stream here is the authors' discovered circuit with the walk rebuilt and other edits described in the white paper.
 - `dqi-reed-solomon`: baseline `khattar-eea` in the grader (Khattar et al., 2025). The stream here is an edit of the authors' discovered circuit: selected Toffolis replaced, then high wire ids relocated into wires that are zero at that point.
 
 ## Tooling

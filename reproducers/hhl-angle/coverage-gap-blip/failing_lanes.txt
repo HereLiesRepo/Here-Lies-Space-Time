@@ -1,4 +1,4 @@
-# Failing (X, k) lanes of hhl-angle reproducer neg_blip (stream sha256 5c6485b5a26c5df573c8ed746115d02c6a5df77bf073e13a0351304d429a4ced)
+# Failing (X, k) lanes of hhl-angle reproducer coverage-gap-blip (stream sha256 4b6d1d9ba17b8779c8301fffe2dd870f7b4af356a902efaa792aa49ecefc4e53)
 # from: ucverify check hhl-angle STREAM --strict --list 1000000 (exhaustive X in [2^16, 2^21) for each k pattern)
 # k patterns with no failing lane are not listed; see README.md for the k pattern definitions.
 # f64 = round(2^32 asin(2^15/X)) as the grader computes it; ext = the same in long double (ucverify ref).

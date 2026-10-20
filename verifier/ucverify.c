@@ -37,7 +37,7 @@
 
 /* ------------------------------------------------------------------ util */
 
-static void die(const char *fmt, ...)
+_Noreturn static void die(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -291,7 +291,7 @@ typedef struct {
 
 static const char *g_err_code = NULL;
 
-static void perr(const char *code, const char *fmt, ...)
+_Noreturn static void perr(const char *code, const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -488,7 +488,8 @@ static void parse(Prog *p)
             for (t = 0; t < p->ntbl; t++)
                 if (p->tbl[t].id == id) perr("load/segment", "stream: duplicate DATA table_id %u", id);
             nbytes = nb / 8u + ((nb % 8u) != 0);
-            need(p, (size_t)nbytes, "DATA bits");
+            if (nbytes > (uint64_t)(p->len - p->pos)) /* before the size_t cast */
+                perr("load/truncated", "stream truncated reading DATA bits");
             GROW(p->tbl, p->ntbl, p->captbl);
             p->tbl[p->ntbl].id = id;
             p->tbl[p->ntbl].nbits = nb;
@@ -518,6 +519,18 @@ static void parse(Prog *p)
     }
 }
 
+/* saturating u64 arithmetic: UINT64_MAX marks a total that does not fit */
+static uint64_t sat_mul(uint64_t a, uint64_t b)
+{
+    uint64_t r;
+    return __builtin_mul_overflow(a, b, &r) ? UINT64_MAX : r;
+}
+static uint64_t sat_add(uint64_t a, uint64_t b)
+{
+    uint64_t r;
+    return __builtin_add_overflow(a, b, &r) ? UINT64_MAX : r;
+}
+
 /* per-iteration analytic totals for ungated subtrees */
 static void analyse(Prog *p, uint64_t it)
 {
@@ -538,13 +551,13 @@ static void analyse(Prog *p, uint64_t it)
         C = &p->items[ch];
         I = &p->items[it];
         if (C->is_loop) {
-            I->it_ops += C->it_ops * C->count;
-            I->it_tof += C->it_tof * C->count;
-            I->it_cliff += C->it_cliff * C->count;
+            I->it_ops = sat_add(I->it_ops, sat_mul(C->it_ops, C->count));
+            I->it_tof = sat_add(I->it_tof, sat_mul(C->it_tof, C->count));
+            I->it_cliff = sat_add(I->it_cliff, sat_mul(C->it_cliff, C->count));
         } else {
-            I->it_ops += C->it_ops;
-            I->it_tof += C->it_tof;
-            I->it_cliff += C->it_cliff;
+            I->it_ops = sat_add(I->it_ops, C->it_ops);
+            I->it_tof = sat_add(I->it_tof, C->it_tof);
+            I->it_cliff = sat_add(I->it_cliff, C->it_cliff);
         }
     }
 }
@@ -568,18 +581,42 @@ static void census_note(Census *c, int space, int64_t v)
     }
 }
 
-static int64_t aff_val(const int64_t *coef, int depth, const uint64_t *idx)
+/* *acc += c * i, exactly; returns 1 if the result does not fit in int64 */
+static int mul_add(int64_t *acc, int64_t c, uint64_t i)
+{
+    int64_t t;
+    if (c == 0 || i == 0) return 0;
+    if (i > (uint64_t)INT64_MAX || __builtin_mul_overflow(c, (int64_t)i, &t)) return 1;
+    return __builtin_add_overflow(*acc, t, acc);
+}
+
+/* base + sum coef_j * idx_j; returns 1 on int64 overflow (the exact value is then far
+ * outside every id and table range, which is how the callers report it) */
+static int aff_val(const int64_t *coef, int depth, const uint64_t *idx, int64_t *out)
 {
     int64_t v = coef[0];
     int j;
-    for (j = 0; j < depth; j++) v += coef[1 + j] * (int64_t)idx[j];
-    return v;
+    for (j = 0; j < depth; j++)
+        if (mul_add(&v, coef[1 + j], idx[j])) return 1;
+    *out = v;
+    return 0;
+}
+
+/* the operand-distinctness rule (validate/aliasing); v[] is -1 for an unused slot */
+static int operands_alias(const int64_t *v)
+{
+    return (v[S_QT] >= 0 && (v[S_QT] == v[S_QB] || v[S_QT] == v[S_QA])) ||
+           (v[S_QB] >= 0 && v[S_QB] == v[S_QA]) || (v[S_OT] >= 0 && v[S_OT] == v[S_OC]) ||
+           (v[S_CT] >= 0 && v[S_CT] == v[S_CC]);
 }
 
 static int gate_on(const Prog *p, const Op *o, const uint64_t *idx, uint64_t opi)
 {
     const Table *t = &p->tbl[o->tbl];
-    int64_t b = aff_val(&p->pool[o->poff], o->depth, idx);
+    int64_t b;
+    if (aff_val(&p->pool[o->poff], o->depth, idx, &b))
+        perr("validate/table-index", "data-gate bit index overflows int64, outside [0, %" PRIu64
+             ") (table %u) at expanded op %" PRIu64, t->nbits, t->id, opi);
     if (b < 0 || (uint64_t)b >= t->nbits)
         perr("validate/table-index", "data-gate bit index %" PRId64 " out of [0, %" PRIu64
              ") (table %u) at expanded op %" PRIu64, b, t->nbits, t->id, opi);
@@ -606,15 +643,20 @@ static void census_sub(const Prog *p, uint64_t it, int depth, int fix, uint64_t 
         for (j = 0; j < o->nop; j++) {
             const int64_t *a = cf + (size_t)j * (1u + o->depth);
             int64_t lo = a[0], hi = a[0];
-            for (d = 0; d < o->depth; d++) {
+            int ovf = 0;
+            for (d = 0; d < o->depth && !ovf; d++) {
                 if (d < fix) {
-                    lo += a[1 + d] * (int64_t)idx[d];
-                    hi += a[1 + d] * (int64_t)idx[d];
+                    ovf = mul_add(&lo, a[1 + d], idx[d]) || mul_add(&hi, a[1 + d], idx[d]);
                 } else {
-                    int64_t span = a[1 + d] * (int64_t)(cnt[d] - 1u);
-                    if (span > 0) hi += span; else lo += span;
+                    int64_t span = 0;
+                    ovf = mul_add(&span, a[1 + d], cnt[d] - 1u) ||
+                          (span > 0 ? __builtin_add_overflow(hi, span, &hi)
+                                    : __builtin_add_overflow(lo, span, &lo));
                 }
             }
+            if (ovf)
+                perr("validate/id-range", "operand of %s resolves outside [0, 2^32) (int64 overflow)",
+                     KIND_NAME[o->kind]);
             if (lo < 0 || hi >= ID_LIMIT)
                 perr("validate/id-range", "operand of %s resolves outside [0, 2^32) (range %"
                      PRId64 "..%" PRId64 ")", KIND_NAME[o->kind], lo, hi);
@@ -633,9 +675,11 @@ static void count_item(const Prog *p, uint64_t it, int depth, uint64_t *idx, uin
         uint64_t i;
         if (I->count == 0) return;
         if (!I->gated_sub) {
-            c->ops += I->it_ops * I->count;
-            c->tof += I->it_tof * I->count;
-            c->cliff += I->it_cliff * I->count;
+            c->ops = sat_add(c->ops, sat_mul(I->it_ops, I->count));
+            c->tof = sat_add(c->tof, sat_mul(I->it_tof, I->count));
+            c->cliff = sat_add(c->cliff, sat_mul(I->it_cliff, I->count));
+            if (c->ops == UINT64_MAX)
+                die("expanded op count reaches 2^64 - 1; ucverify cannot count this stream");
             census_sub(p, it, depth, depth, idx, cnt, c);
             return;
         }
@@ -648,18 +692,27 @@ static void count_item(const Prog *p, uint64_t it, int depth, uint64_t *idx, uin
     } else {
         const Op *o = &p->ops[I->op];
         const int64_t *cf = &p->pool[o->poff];
+        int64_t sv[S_N];
         int j, cls;
         if (o->gated) {
             if (!gate_on(p, o, idx, c->ops)) return;
             cf += 1 + o->depth;
         }
+        for (j = 0; j < S_N; j++) sv[j] = -1;
         for (j = 0; j < o->nop; j++) {
-            int64_t v = aff_val(cf + (size_t)j * (1u + o->depth), o->depth, idx);
+            int64_t v;
+            if (aff_val(cf + (size_t)j * (1u + o->depth), o->depth, idx, &v))
+                perr("validate/id-range", "operand overflows int64, outside [0, 2^32), at"
+                     " expanded op %" PRIu64, c->ops);
             if (v < 0 || v >= ID_LIMIT)
                 perr("validate/id-range", "operand resolves to %" PRId64 ", outside [0, 2^32), at"
                      " expanded op %" PRIu64, v, c->ops);
             census_note(c, SLOT_SPACE[o->slot[j]], v);
+            sv[o->slot[j]] = v;
         }
+        if (operands_alias(sv))
+            perr("validate/aliasing", "%s: operands not distinct at expanded op %" PRIu64,
+                 KIND_NAME[o->kind], c->ops);
         cls = bill_class(o->kind, (o->flags & 4) != 0);
         c->ops++;
         if (cls == 2) c->tof++;
@@ -787,15 +840,15 @@ static void sim_exec_op(Sim *s, const Op *o, const uint64_t *idx)
     }
     for (j = 0; j < S_N; j++) v[j] = -1;
     for (j = 0; j < o->nop; j++) {
-        val[j] = aff_val(cf + (size_t)j * (1u + o->depth), o->depth, idx);
+        if (aff_val(cf + (size_t)j * (1u + o->depth), o->depth, idx, &val[j]))
+            perr("validate/id-range", "operand overflows int64, outside [0, 2^32), at "
+                 "expanded op %" PRIu64, opi);
         if (val[j] < 0 || val[j] >= ID_LIMIT)
             perr("validate/id-range", "operand resolves to %" PRId64 ", outside [0, 2^32), at "
                  "expanded op %" PRIu64, val[j], opi);
         v[o->slot[j]] = val[j];
     }
-    if ((v[S_QT] >= 0 && (v[S_QT] == v[S_QB] || v[S_QT] == v[S_QA])) ||
-        (v[S_QB] >= 0 && v[S_QB] == v[S_QA]) || (v[S_OT] >= 0 && v[S_OT] == v[S_OC]) ||
-        (v[S_CT] >= 0 && v[S_CT] == v[S_CC]))
+    if (operands_alias(v))
         perr("validate/aliasing", "%s: operands not distinct at expanded op %" PRIu64,
              KIND_NAME[o->kind], opi);
     s->ops++;
@@ -1223,10 +1276,12 @@ static void load_vectors(Adapter *a, const char *path)
         a->sc.band[r] = b;
     }
     VGET(8, L);
+    /* every lane takes at least one byte: bound L before allocating */
+    if (L > c->len - pos || L > SIZE_MAX / 8u) die("%s: truncated (%" PRIu64 " lanes declared)", path, L);
     c->off = xmalloc((size_t)(L ? L : 1) * 8u);
     for (i = 0; i < L; i++) {
-        c->off[i] = pos;
         if (pos >= c->len) die("%s: truncated lane %" PRIu64, path, i);
+        c->off[i] = pos;
         if (c->buf[pos++]) {
             pos++;
             for (r = 0; r < a->sc.nregs; r++) {
@@ -1260,7 +1315,7 @@ typedef struct {
 static int band_ok(const uint8_t *rd, const uint8_t *ex, uint32_t width, uint64_t band)
 {
     uint32_t nb = (width + 7u) / 8u;
-    if (band == 0 || width > 64) {
+    if (band == 0 || width == 0 || width > 64) { /* width 0: nothing to compare */
         uint32_t i;
         for (i = 0; i < nb; i++) {
             uint8_t m = 0xFF;
@@ -1310,6 +1365,9 @@ static void run_check(const Prog *p, const Census *cs, Adapter *a, int W, int li
     s.nq = cs->nq;
     s.nb = cs->nb;
     s.no = cs->no;
+    if ((uint64_t)s.nq * (uint64_t)W >= SIZE_MAX / 8u || (uint64_t)s.nb * (uint64_t)W >= SIZE_MAX / 8u)
+        die("simulation state (%" PRIu64 " qubits, %" PRIu64 " bits, %d words) exceeds this"
+            " build's address space", s.nq, s.nb, W);
     s.q = xcalloc((size_t)s.nq * W + 1, 8);
     s.b = xcalloc((size_t)s.nb * W + 1, 8);
     s.slot = xcalloc((size_t)s.no + 1, sizeof(DSet));
@@ -1403,6 +1461,9 @@ static void run_check(const Prog *p, const Census *cs, Adapter *a, int W, int li
                 const Reg *R = &p->regs[r];
                 size_t nb = (R->nw + 7u) / 8u;
                 if (!tc.has_exp[r]) continue;
+                if (R->kind != 0)
+                    die("register %d is Bit-kind but a test case carries an expected output for it"
+                        " (Bit registers are input-only)", r);
                 memset(rd[r], 0, nb);
                 for (i = 0; i < R->nw; i++)
                     if ((s.q[(size_t)R->w[i] * W + wd] >> (l & 63u)) & 1u)
@@ -1479,7 +1540,7 @@ static void print_metrics(const Prog *p, const Census *c)
  * or "rix riy riz rjx rjy rjz k k_out" (coulomb-potential) per line and
  * recomputes the ideal from the README formula in extended precision
  * (long double asinl / sqrtl, a different code path from the f64 oracle). */
-static void usage(void);
+_Noreturn static void usage(void);
 static int ref_main(int argc, char **argv)
 {
     char line[512];
@@ -1527,7 +1588,7 @@ static int ref_main(int argc, char **argv)
     return bad;
 }
 
-static void usage(void)
+_Noreturn static void usage(void)
 {
     fputs("usage:\n"
           "  ucverify count STREAM\n"

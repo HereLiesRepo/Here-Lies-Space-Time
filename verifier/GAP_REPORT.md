@@ -9,7 +9,7 @@ The hhl-angle contract requires the map
 arbitrary accumulator `k` (README section 1: "an arbitrary accumulator
 `k`"; section 3.1: "Its initial value is arbitrary").
 
-The grader tests about 8,744 shots, each with an independent uniform
+The grader tests about 8,742 shots (9,024 draws, of which 31/32 are in the domain), each with an independent uniform
 `k`. Some wrong adders are wrong only when the ideal result
 `k* = k + f(X) mod 2^33` lies next to a carry boundary, that is, when a long
 run of its bits is all ones or all zeros. A uniform `k` produces such a run
@@ -19,7 +19,7 @@ mishandles long carries can be accepted.
 We give two reproducers. Both are deliberate one-place bugs in the authors'
 own released circuit, `tasks/hhl-angle/circuits/discovered` (README.md says
 exactly how each was made). The unchanged grader accepts both. Both are
-wrong for some `(X, k)` by at least 2^30 output units, where the band is 429.
+wrong for some `(X, k)` by about 2^30 output units or more (the smallest error is 2^30 - 402), where the band is 429.
 
 | reproducer | official result (unchanged grader) | ucverify, exhaustive `X` (strict suite) |
 |---|---|---|
@@ -144,13 +144,13 @@ We measured the per-shot failure probability under the grader's own
 distribution: uniform in-domain `X` and uniform `k`, using
 `random:101` … `random:150`, i.e. 50 × 2,031,616 = 101,580,800 lanes.
 
-| reproducer | failing lanes / 101,580,800 | p per shot (95% interval) | expected failures in 8,744 shots | P(grader catches it) |
+| reproducer | failing lanes / 101,580,800 | p per shot (95% interval) | expected failures in 8,742 shots | P(grader catches it) |
 |---|---:|---|---:|---:|
 | coverage-gap-carry30 | 43 | 4.23e-7 (3.06e-7 – 5.70e-7) | 0.0037 | 0.37 % |
 | coverage-gap-blip | 12 | 1.18e-7 (0.61e-7 – 2.06e-7) | 0.0010 | 0.10 % |
 
 The intervals are exact Poisson intervals. The catch probability is
-`1 - (1 - p)^8744`.
+`1 - (1 - p)^8742`.
 
 The grader's test inputs are a fixed function of the stream hash, so a
 stream is either always accepted or always rejected. A one-op change to the
@@ -184,17 +184,22 @@ changes `tasks/hhl-angle/grader.py` and the testing section of
   failure policy (STRICT) are unchanged.
 
 We applied it to a scratch copy of the repository (the original checkout
-was not modified) and ran the same command as in section 2:
+was not modified) and ran `tools/eval.py hhl-angle --ops FILE --json`. The
+figures below are from a re-run on 2026-10-20 with the grader's pure-Python
+reference executor and `--jobs 4`; the released `patched_grade.json` files
+(`reproducers/`) are that run's output. An earlier run with the C kernel gave
+the same verdicts and counters.
 
 | stream | expected | patched grader | T x Q | shots | wrong output | wrong sign | time |
 |---|---|---|---|---:|---:|---:|---:|
-| coverage-gap-carry30 | reject | **FAIL** (verdict/classical) | 1345 x 115 | 6,103,595 | 469 | 0 | 92 s |
-| coverage-gap-blip | reject | **FAIL** (verdict/classical) | 1348 x 115 | 6,103,596 | 320 | 0 | 72 s |
-| discovered, unchanged (99e0420d…) | accept | **OK** | 1348 x 115 | 6,103,589 | 0 | 0 | 84 s |
+| coverage-gap-carry30 | reject | **FAIL** (verdict/classical) | 1345 x 115 | 6,103,595 | 469 | 0 | 138 s |
+| coverage-gap-blip | reject | **FAIL** (verdict/classical) | 1348 x 115 | 6,103,596 | 320 | 0 | 140 s |
+| discovered, unchanged (99e0420d…) | accept | **OK** | 1348 x 115 | 6,103,589 | 0 | 0 | 139 s |
+| our hhl-angle stream (2c59af9e…) | accept | **OK** | 1087 x 113 | 6,103,565 | 0 | 0 | 160 s |
 
 Both rejections report shot 10,048 first, which is in the sweep at
-`B = 0`. Times are wall-clock with `--jobs 2` (C kernel executor) on a
-4-core host that was shared with other jobs.
+`B = 0`. Times are the grader's own `total_s`, on a 4-core host shared with
+other jobs.
 
 Runtime cost: the unchanged grader runs 2 batches of 8,192 lanes. The
 patched grader runs 746 batches. The cost scales linearly in the number of
@@ -215,4 +220,5 @@ check) at about one third of the cost.
   that the adder is correct.
 - ucverify was written from the format specification in this repository
   and shares no code with it. Its counts equal the published numbers for
-  all 17 stored paper circuits (`make check`).
+  all 17 paper circuits the grader stores as `circuit.ops.xz` (`make check`);
+  the seven divsteps variants stored under other names are not checked.
