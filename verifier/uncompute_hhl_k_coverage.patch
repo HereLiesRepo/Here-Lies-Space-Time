@@ -1,0 +1,59 @@
+--- a/tasks/hhl-angle/README.md
++++ b/tasks/hhl-angle/README.md
+@@ -254,6 +254,12 @@
+ residue space, including the wraparound. Every tested shot must preserve
+ `X` exactly and satisfy the 429-unit bound.
+ 
++A uniform `k` rarely puts the ideal result next to a carry boundary, so
++the grader then sweeps every in-domain `X` once for each boundary
++$B\in\{0,2^{31},2^{32}\}$. Each sweep shot chooses `k` so that the ideal
++result is $k^\star=(B+d)\bmod 2^{33}$, with $d\in[-128,127]$ drawn from the
++shot's own XOF. The sweep adds 6,094,848 shots, all live.
++
+ ## 7. References
+ 
+ - Harrow, Hassidim, and Lloyd (2009), arXiv:0811.3171. The HHL algorithm
+--- a/tasks/hhl-angle/grader.py
++++ b/tasks/hhl-angle/grader.py
+@@ -74,11 +74,23 @@
+     return (k_in + ideal_h(x)) & MASK33
+ 
+ 
++# Carry-boundary sweep. A uniform k puts the ideal result k* = (k + f(X))
++# mod 2^33 next to a carry boundary 2^j only with probability ~2^-r for a
++# run of r equal bits, so an adder that is wrong only on long carry or
++# borrow runs passes the random draws. After the random draws, every
++# in-domain X is tested once per boundary B, with k chosen so that
++# k* = B + d, where d in [-128, 127] comes from the shot's own XOF.
++RANDOM_TESTS = 9024
++N_DOMAIN = X_MAX - X_MIN + 1
++CARRY_BOUNDARIES = (0, 1 << 31, 1 << 32)
++
++
+ class HhlAngle(Task):
+     name = "hhl-angle"
+     seed_domain = b"hhl-angle"
+-    # 3-byte draw masked to 21 bits: acceptance 31/32, E[live] = 8742.
+-    num_tests = 9024
++    # 3-byte draw masked to 21 bits: acceptance 31/32, E[live] = 8742,
++    # then the deterministic carry-boundary sweep (all live).
++    num_tests = RANDOM_TESTS + len(CARRY_BOUNDARIES) * N_DOMAIN
+ 
+     def schema(self):
+         return [
+@@ -103,6 +115,15 @@
+             expected_phase=False,
+         )
+ 
++    def gen_test_indexed(self, shot, xof):
++        if shot < RANDOM_TESTS:
++            return self.gen_test(xof)
++        b, j = divmod(shot - RANDOM_TESTS, N_DOMAIN)
++        x = X_MIN + j
++        k_star = (CARRY_BOUNDARIES[b] + xof.read(1)[0] - 128) & MASK33
++        k = (k_star - ideal_h(x)) & MASK33
++        return TestCase(inputs=[x, k], expected=[x, k_star], expected_phase=False)
++
+     def check_shot(self, tc, read):
+         # Banded acceptance: X exact; k within the centered mod-2^33 band.
+         if read[0] != tc.inputs[0]:

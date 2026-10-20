@@ -1,0 +1,8 @@
+== blip zero
+equiv mode=zero draws=860 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=0 dirty_reset_lanes=0 k_out_differs_from_baseline=0 clean=1
+== blip xormix
+equiv mode=xormix draws=860 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=0 dirty_reset_lanes=0 k_out_differs_from_baseline=2 clean=0
+== blip splitmix:1
+equiv mode=splitmix:1 draws=860 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=0 dirty_reset_lanes=0 k_out_differs_from_baseline=0 clean=1
+== blip splitmix:5
+equiv mode=splitmix:5 draws=860 x_changed=0 dirty_lanes=0 const_sign_lanes=0 outcome_dependent_sign_lanes=0 dirty_reset_lanes=0 k_out_differs_from_baseline=0 clean=1
