@@ -2,6 +2,8 @@
 
 By Michael David Brown (HereLiesScarlet), Lafayette, LA. Contact: here.lies.scarlet@gmail.com
 
+White paper: https://doi.org/10.5281/zenodo.23486661 (Zenodo, DOI 10.5281/zenodo.23486661).
+
 Quantum circuits (op streams, OpenQASM 3 and grade receipts) that score below the circuits of arXiv:2610.22367 (A. Gu, A. H. Kemeny, S. F. Yelin, M. D. Lukin) on all eight of its tasks. Grader: `andigu/uncompute` at commit `64b5a13aa249f1360846657392e6c66817b26d0f`, unmodified.
 
 This repository holds the best circuit for each task, a second point adder built only from published techniques, their grade receipts, the white paper (`paper/`) and a standalone C verifier (`verifier/`). It holds no generator code.
