@@ -1,0 +1,1 @@
+{"h_ops": "48bf7e78a7eacac0e1201d8a8e9ab575f08f261f9176056df4d79fdd390802c0", "metrics": {"toffoli": 1012, "clifford": 7224, "qubits": 139, "outcomes": 750, "bits": 0, "ops": 8906, "tq_cost": 140668}}
