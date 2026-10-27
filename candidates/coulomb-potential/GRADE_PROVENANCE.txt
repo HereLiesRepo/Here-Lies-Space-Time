@@ -1,0 +1,6 @@
+grader: andigu/uncompute 64b5a13aa249f1360846657392e6c66817b26d0f tools/eval.py (reference executor)
+command: uv run python tools/eval.py coulomb-potential --ops candidates/coulomb-potential/stream.ops.xz --out DIR
+candidate: here-lies-space-time claude/gu-slice-coulomb-clifford 8d4860b484bf85ba6eea71345b5484b1ea19b721
+h_ops: 48bf7e78a7eacac0e1201d8a8e9ab575f08f261f9176056df4d79fdd390802c0
+graded: 2026-10-27, master container
+grade.json and tq_cost.json are the grader output, byte for byte.
