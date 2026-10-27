@@ -38,7 +38,7 @@ Paper = discovered circuit as printed in the paper (rounded where the paper roun
 | all 8 | TQ-cost | see README | see README | BEATEN (authors' grader) | the original claim; not recounted |
 | all 8 | Clifford (other 7) | needs grader results.jsonl | in `grade.json` | OPEN | cannot compare without paper-circuit grades |
 
-Counts: BEATEN 14 + 1 (TQ row), BOUND 0, OPEN 12 (rows as written above; "BEATEN" here means authors' grader only).
+Counts: BEATEN 15 (authors' grader only; stricter-grader receipts not produced), BOUND 0, OPEN 8.
 
 ## What is blocked
 - Re-grading the paper's circuits (Clifford, ops) and any stricter-grader run need `andigu/uncompute@64b5a13`; attaching it was denied in this session. Needs the owner's call.
