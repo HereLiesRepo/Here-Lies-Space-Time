@@ -23,7 +23,7 @@ Paper = discovered circuit as printed in the paper (rounded where the paper roun
 | coulomb-potential | Toffoli | 1,140 | 1,012 | BEATEN (authors' grader) | |
 | coulomb-potential | qubits | 142 | 139 | BEATEN (authors' grader) | |
 | chemistry-fe2s2 | Toffoli | 14,978 | 9,467 | BEATEN (authors' grader) | |
-| chemistry-fe2s2 | qubits | 126 | 145 | OPEN | ours is 19 higher; no qubit-reduction attempt recorded in this repo |
+| chemistry-fe2s2 | qubits | 126 | 145 | OPEN | ours is 19 higher. Tried: wire-liveness analysis of our stream (`results/tools/liveness.py`, intervals split at R/HMR): 72 register wires + peak 73 concurrently live ancilla wires = 145, so wire relocation cannot lower it; a lower count needs a different register layout (not attempted). Parser sanity: reproduces 113 on hhl-angle |
 | dqi-hermitian | Toffoli | 926,912 | 707,278 | BEATEN (authors' grader) | |
 | dqi-hermitian | qubits | 2,395 | 2,328 | BEATEN (authors' grader) | |
 | dqi-hermitian | failed shots (of 100,000) | 30 (paper text) | 59 | OPEN | ours is worse; limit is 100 |
