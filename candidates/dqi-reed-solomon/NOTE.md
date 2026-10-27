@@ -20,7 +20,7 @@ Stream-level only. The tool is `tools/rw.c` (C, not Python). It parses the OPSTR
 
 Why each edit is an identity: CX, CZ and SWAP are self-inverse, and the two ops are adjacent in the executed sequence (the same FLAT list, or the same LOOP body item list, which runs in order for each iteration). Two adjacent identical involutions compose to the identity on the state and do not touch any measurement or outcome. Outcome numbering, HMR/R ops, register declarations, DATA tables and qubit ids are unchanged, so Toffoli and qubit counts are unchanged too. END is reduced by the removed ops, weighted by enclosing loop counts. `ucverify count` accepts the output, and its op count equals the new END value.
 
-Removed: 307,235 pairs (plain count; each loop-body pair counted once here, and weighted by loop count in the tool's census: 614,470 ops, i.e. 614,470 Cliffords).
+Removed: 307,235 pairs (614,470 Cliffords). Every removed pair has loop multiplicity 1: the plain and loop-weighted pair counts are both 307,235 from the tool census.
 
 Only 212 Clifford reductions were needed for target B, so the candidate removes far more than the target requires. If a smaller edit is preferred, the tool can be restricted to the first N pairs.
 
