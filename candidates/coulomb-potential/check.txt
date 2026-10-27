@@ -1,0 +1,43 @@
+{"h_ops": "48bf7e78a7eacac0e1201d8a8e9ab575f08f261f9176056df4d79fdd390802c0", "metrics": {"toffoli": 1012, "clifford": 7224, "qubits": 139, "outcomes": 750, "bits": 0, "ops": 8906, "tq_cost": 140668}}
+{"task": "coulomb-potential", "k": "zero", "ri": [0,0,0], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "zero", "ri": [255,255,255], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "zero", "ri": [128,128,128], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "zero", "ri": [0,255,128], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "ones", "ri": [0,0,0], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "ones", "ri": [255,255,255], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "ones", "ri": [128,128,128], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "ones", "ri": [0,255,128], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "xormix", "ri": [0,0,0], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "xormix", "ri": [255,255,255], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "xormix", "ri": [128,128,128], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "xormix", "ri": [0,255,128], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "splitmix:1", "ri": [0,0,0], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "splitmix:1", "ri": [255,255,255], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "splitmix:1", "ri": [128,128,128], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "splitmix:1", "ri": [0,255,128], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "splitmix:5", "ri": [0,0,0], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "splitmix:5", "ri": [255,255,255], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "splitmix:5", "ri": [128,128,128], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"task": "coulomb-potential", "k": "splitmix:5", "ri": [0,255,128], "failing": [
+  null], "lanes": 16777216, "live": 16777215, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 0, "reset_of_nonzero": 0, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 0}
+{"verdict": "PASS"}
+exit 0
