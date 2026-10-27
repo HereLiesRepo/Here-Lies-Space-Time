@@ -1,0 +1,1 @@
+Copied verbatim from andigu/uncompute commit 64b5a13aa249f1360846657392e6c66817b26d0f (Apache-2.0), tasks/<task>/results.jsonl, by the master on 2026-10-27 so the paper circuits have their official grades in this lane. Unmodified.
