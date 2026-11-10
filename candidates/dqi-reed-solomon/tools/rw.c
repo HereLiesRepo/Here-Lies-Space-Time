@@ -43,6 +43,7 @@ static uint64_t rd(int n)
 static Node *node_new(int is_loop)
 {
     Node *n = calloc(1, sizeof *n);
+    if (!n) die("oom");
     n->is_loop = is_loop;
     return n;
 }
@@ -50,8 +51,11 @@ static Node *node_new(int is_loop)
 static void push_child(Node *L, Node *c)
 {
     if (L->nch == L->cap) {
-        L->cap = L->cap ? L->cap * 2 : 8;
-        L->ch = realloc(L->ch, L->cap * sizeof *L->ch);
+        uint32_t ncap = L->cap ? L->cap * 2 : 8;
+        Node **t = realloc(L->ch, (size_t)ncap * sizeof *L->ch);
+        if (!t) die("oom");
+        L->ch = t;
+        L->cap = ncap;
     }
     L->ch[L->nch++] = c;
 }
@@ -85,25 +89,69 @@ static Node *parse_op2(int depth)
     return n;
 }
 
-static Node *parse_loop_body(int enclosing); /* count, n, items */
+/* LOOP parsing is iterative: an explicit stack of open loops, grown from the
+ * input, so nesting depth is limited only by memory. */
+typedef struct PFrame {
+    Node *L;
+    uint32_t rem;
+} PFrame;
 
-static Node *parse_loop_body(int enclosing)
+static Node *parse_loop_header(void)
 {
     Node *L = node_new(1);
-    uint32_t n, i;
+    uint32_t n;
     L->count = rd(8);
     n = (uint32_t)rd(2);
     if (n == 0) die("LOOP with 0 items");
-    for (i = 0; i < n; i++) {
-        uint8_t ik = (uint8_t)rd(1);
-        if (ik == 0)
-            push_child(L, parse_op2(enclosing + 1));
-        else if (ik == 1)
-            push_child(L, parse_loop_body(enclosing + 1));
-        else
-            die("bad item kind");
-    }
+    L->cap = n; /* remaining items, consumed by the caller's frame */
     return L;
+}
+
+/* Parse a LOOP body (after the segment/item kind byte); enclosing = 0 at top level. */
+static Node *parse_loop_body(int enclosing)
+{
+    PFrame *st = NULL;
+    size_t sp = 0, cap = 0;
+    Node *root = parse_loop_header();
+    (void)enclosing; /* depth is the number of open loops (enclosing is 0 here) */
+    cap = 16;
+    st = malloc(cap * sizeof *st);
+    if (!st) die("oom");
+    st[sp].L = root;
+    st[sp].rem = root->cap;
+    root->cap = 0;
+    sp++;
+    while (sp > 0) {
+        PFrame *f = &st[sp - 1];
+        uint8_t ik;
+        if (f->rem == 0) {
+            sp--;
+            continue;
+        }
+        f->rem--;
+        ik = (uint8_t)rd(1);
+        if (ik == 0) {
+            push_child(f->L, parse_op2((int)sp));
+        } else if (ik == 1) {
+            Node *c = parse_loop_header();
+            uint32_t crem = c->cap;
+            push_child(f->L, c);
+            c->cap = 0;
+            if (sp == cap) {
+                PFrame *t = realloc(st, cap * 2 * sizeof *st);
+                if (!t) die("oom");
+                st = t;
+                cap *= 2;
+            }
+            st[sp].L = c;
+            st[sp].rem = crem;
+            sp++;
+        } else {
+            die("bad item kind");
+        }
+    }
+    free(st);
+    return root;
 }
 
 /* ---------- reduction: stack-cancel adjacent identical cancellable ops ---------- */
@@ -117,34 +165,82 @@ static int same_bytes(const Node *a, const Node *b)
     return a->e - a->s == b->e - b->s && memcmp(buf + a->s, buf + b->s, a->e - a->s) == 0;
 }
 
-/* reduce list in place; mult = product of enclosing loop counts. Returns new length. */
+typedef struct RFrame {
+    Node **list;
+    uint32_t *pn;   /* where the reduced length is stored */
+    Node *owner;    /* the loop this list belongs to (NULL at the root) */
+    Node **out;
+    uint32_t n, i, top;
+    uint64_t mult;  /* product of enclosing loop counts */
+    int ovf;        /* mult overflowed 64 bits: fatal only if a cancel uses it */
+} RFrame;
+
+static void rframe_open(RFrame *f, Node **list, uint32_t *pn, Node *owner, uint64_t mult, int ovf)
+{
+    f->list = list;
+    f->pn = pn;
+    f->owner = owner;
+    f->n = *pn;
+    f->i = 0;
+    f->top = 0;
+    f->mult = mult;
+    f->ovf = ovf;
+    f->out = malloc(((size_t)f->n + 1) * sizeof *f->out);
+    if (!f->out) die("oom");
+}
+
+/* reduce list in place; mult = product of enclosing loop counts. Iterative. */
 static void reduce_list(Node **list, uint32_t *nlist, uint64_t mult)
 {
-    uint32_t i, top = 0;
-    Node **out = malloc((*nlist + 1) * sizeof *out);
-    for (i = 0; i < *nlist; i++) {
-        Node *c = list[i];
-        if (c->is_loop) {
-            uint32_t m = c->nch;
-            reduce_list(c->ch, &m, mult * c->count);
-            c->nch = m;
-            if (m == 0) continue; /* empty body: drop the loop */
-            out[top++] = c;
-            continue;
+    RFrame *st;
+    size_t sp = 0, cap = 16;
+    st = malloc(cap * sizeof *st);
+    if (!st) die("oom");
+    rframe_open(&st[sp++], list, nlist, NULL, mult, 0);
+    while (sp > 0) {
+        RFrame *f = &st[sp - 1];
+        if (f->i < f->n) {
+            Node *c = f->list[f->i++];
+            if (c->is_loop) {
+                uint64_t m2;
+                int ovf = f->ovf | __builtin_mul_overflow(f->mult, c->count, &m2);
+                if (sp == cap) {
+                    RFrame *t = realloc(st, cap * 2 * sizeof *st);
+                    if (!t) die("oom");
+                    st = t;
+                    cap *= 2;
+                    f = &st[sp - 1];
+                }
+                rframe_open(&st[sp++], c->ch, &c->nch, c, m2, ovf);
+                continue;
+            }
+            if (c->cancellable && f->top > 0 && f->out[f->top - 1]->cancellable &&
+                same_bytes(f->out[f->top - 1], c)) {
+                /* the top op and c cancel; each removed op is counted at its multiplicity */
+                uint64_t m2;
+                if (f->ovf || __builtin_mul_overflow(f->mult, (uint64_t)2, &m2) ||
+                    __builtin_add_overflow(removed_pairs_w, f->mult, &removed_pairs_w) ||
+                    __builtin_add_overflow(removed_ops_w, m2, &removed_ops_w))
+                    die("removed op count overflows 64 bits");
+                removed_pairs_plain++;
+                f->top--;
+                continue;
+            }
+            f->out[f->top++] = c;
+        } else {
+            /* list done: write back, free, pop, and hand the loop to its parent */
+            Node *owner = f->owner;
+            memcpy(f->list, f->out, (size_t)f->top * sizeof *f->out);
+            free(f->out);
+            *f->pn = f->top;
+            sp--;
+            if (sp > 0 && f->top != 0) {
+                RFrame *p = &st[sp - 1];
+                p->out[p->top++] = owner; /* empty body: the loop is dropped */
+            }
         }
-        if (c->cancellable && top > 0 && out[top - 1]->cancellable && same_bytes(out[top - 1], c)) {
-            /* the top op and c cancel; each removed op is counted at its multiplicity */
-            removed_pairs_w += mult;
-            removed_ops_w += 2 * mult;
-            removed_pairs_plain++;
-            top--;
-            continue;
-        }
-        out[top++] = c;
     }
-    memcpy(list, out, top * sizeof *out);
-    free(out);
-    *nlist = top;
+    free(st);
 }
 
 /* ---------- output ---------- */
@@ -155,8 +251,11 @@ static size_t olen, ocap;
 static void emit(const void *p, size_t n)
 {
     if (olen + n > ocap) {
-        ocap = (olen + n) * 2 + 4096;
-        obuf = realloc(obuf, ocap);
+        size_t ncap = (olen + n) * 2 + 4096;
+        uint8_t *t = realloc(obuf, ncap);
+        if (!t) die("oom");
+        obuf = t;
+        ocap = ncap;
     }
     memcpy(obuf + olen, p, n);
     olen += n;
@@ -169,25 +268,50 @@ static void emit_u(uint64_t v, int n)
     emit(b, n);
 }
 
-static void emit_loop_body(const Node *L);
-
-static void emit_item(const Node *c)
-{
-    if (c->is_loop) {
-        emit_u(1, 1);
-        emit_loop_body(c);
-    } else {
-        emit_u(0, 1);
-        emit(buf + c->s, c->e - c->s);
-    }
-}
-
-static void emit_loop_body(const Node *L)
-{
+typedef struct EFrame {
+    const Node *L;
     uint32_t i;
-    emit_u(L->count, 8);
-    emit_u(L->nch, 2);
-    for (i = 0; i < L->nch; i++) emit_item(L->ch[i]);
+} EFrame;
+
+/* Iterative: an explicit stack of open loops, grown as needed. */
+static void emit_loop_body(const Node *root)
+{
+    EFrame *st;
+    size_t sp = 0, cap = 16;
+    st = malloc(cap * sizeof *st);
+    if (!st) die("oom");
+    emit_u(root->count, 8);
+    emit_u(root->nch, 2);
+    st[sp].L = root;
+    st[sp].i = 0;
+    sp++;
+    while (sp > 0) {
+        EFrame *f = &st[sp - 1];
+        const Node *c;
+        if (f->i == f->L->nch) {
+            sp--;
+            continue;
+        }
+        c = f->L->ch[f->i++];
+        if (c->is_loop) {
+            emit_u(1, 1);
+            emit_u(c->count, 8);
+            emit_u(c->nch, 2);
+            if (sp == cap) {
+                EFrame *t = realloc(st, cap * 2 * sizeof *st);
+                if (!t) die("oom");
+                st = t;
+                cap *= 2;
+            }
+            st[sp].L = c;
+            st[sp].i = 0;
+            sp++;
+        } else {
+            emit_u(0, 1);
+            emit(buf + c->s, c->e - c->s);
+        }
+    }
+    free(st);
 }
 
 int main(int argc, char **argv)
@@ -197,6 +321,7 @@ int main(int argc, char **argv)
     uint8_t *tmp;
     uint64_t end_declared = 0;
     uint64_t total_ops_expanded_removed = 0;
+    uint64_t end_new = UINT64_MAX;
     size_t regs_s = 0, regs_e = 0;
     int have_regs = 0;
     /* read input */
@@ -221,8 +346,6 @@ int main(int argc, char **argv)
     /* segments: keep REGS and DATA raw; FLAT and LOOP re-emitted; END recomputed */
     emit("OPSTRM01", 8);
     {
-        Node **top = NULL;
-        uint32_t ntop = 0, captop = 0;
         for (;;) {
             uint8_t seg = (uint8_t)rd(1);
             if (seg == 0x01) {
@@ -241,14 +364,18 @@ int main(int argc, char **argv)
                 uint64_t nb;
                 rd(4);
                 nb = rd(8);
+                if (nb > (uint64_t)(len - pos) * 8) die("truncated");
                 pos += (size_t)(nb / 8 + ((nb % 8) != 0));
                 emit(buf + s, pos - s);
             } else if (seg == 0x03) {
                 /* FLAT: a top-level list of ops at depth 0 */
                 uint32_t n = (uint32_t)rd(4), i;
-                uint32_t cap2 = n + 1;
-                Node **flat = malloc(cap2 * sizeof *flat);
+                size_t cap2 = (size_t)n + 1;
+                Node **flat;
                 uint32_t nflat = n;
+                if (n > (len - pos) / 2) die("truncated");
+                flat = malloc(cap2 * sizeof *flat);
+                if (!flat) die("oom");
                 for (i = 0; i < n; i++) flat[i] = parse_op2(0);
                 reduce_list(flat, &nflat, 1);
                 emit_u(0x03, 1);
@@ -257,20 +384,12 @@ int main(int argc, char **argv)
                 free(flat);
             } else if (seg == 0x04) {
                 Node *L = parse_loop_body(0);
-                uint32_t m = 1;
                 /* top-level loops: reduce body, drop if empty */
                 reduce_list(L->ch, &L->nch, L->count);
-                /* when the body is reduced, the counts above used multiplicity count */
-                (void)m;
                 if (L->nch > 0) {
                     emit_u(0x04, 1);
                     emit_loop_body(L);
                 }
-                if (ntop == captop) {
-                    captop = captop ? captop * 2 : 16;
-                    top = realloc(top, captop * sizeof *top);
-                }
-                top[ntop++] = L;
             } else if (seg == 0xFF) {
                 end_declared = rd(8);
                 if (pos != len) die("trailing bytes after END");
@@ -282,21 +401,24 @@ int main(int argc, char **argv)
         (void)have_regs;
         (void)regs_s;
         (void)regs_e;
-        (void)top;
         /* END: old count minus removed ops */
         total_ops_expanded_removed = removed_ops_w;
         emit_u(0xFF, 1);
-        emit_u(end_declared - total_ops_expanded_removed, 8);
+        if (end_declared != UINT64_MAX) { /* UINT64_MAX is the format's UNKNOWN count: keep it */
+            if (total_ops_expanded_removed > end_declared) die("END smaller than removed ops");
+            end_new = end_declared - total_ops_expanded_removed;
+        }
+        emit_u(end_new, 8);
     }
     f = fopen(argv[2], "wb");
     if (!f) die("open out");
-    fwrite(obuf, 1, olen, f);
-    fclose(f);
+    if (fwrite(obuf, 1, olen, f) != olen) die("write failed");
+    if (fclose(f)) die("write failed");
     fprintf(stderr,
             "rw: removed_pairs_plain=%" PRIu64 " removed_pairs_weighted=%" PRIu64
             " removed_ops_weighted=%" PRIu64 " clifford_saved=%" PRIu64 " end_old=%" PRIu64
             " end_new=%" PRIu64 "\n",
             removed_pairs_plain, removed_pairs_w, removed_ops_w, removed_ops_w,
-            end_declared, end_declared - total_ops_expanded_removed);
+            end_declared, end_new);
     return 0;
 }
