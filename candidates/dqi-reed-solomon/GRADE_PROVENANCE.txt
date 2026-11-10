@@ -1,0 +1,6 @@
+grader: andigu/uncompute 64b5a13aa249f1360846657392e6c66817b26d0f tools/eval.py (C kernel executor, built with make kernel)
+command: uv run python tools/eval.py dqi-reed-solomon --ops candidates/dqi-reed-solomon/stream.ops.xz --out DIR
+candidate: here-lies-space-time claude/gu-slice-rs 2cada67b267723091e5c736c33de7951f8f68260
+h_ops: 9dc40b38057a21c2d032801ed301aff753750e8ea6886e1c3d3ca06f9c476f10
+graded: 2026-10-27, master container
+grade.json and tq_cost.json are the grader output, byte for byte.
