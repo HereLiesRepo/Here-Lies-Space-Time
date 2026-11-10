@@ -17,6 +17,7 @@ This package contains:
 |---|---|
 | `ucverify.c` | the verifier |
 | `Makefile` | `make`, `make check`, `make reproduce` |
+| `caps_court.sh` | `make check-caps`: ucverify takes any number of registers, k patterns, r_i points and words, and lines of any length |
 | `README.md` | this file |
 | `GAP_REPORT.md` | a test-coverage gap in the hhl-angle grader, with reproducers |
 | `uncompute_hhl_k_coverage.patch` | a proposed grader change for hhl-angle |
@@ -28,6 +29,7 @@ This package contains:
 ```sh
 make            # cc -std=c11 -O2 -Wall -Wextra -Werror -o ucverify ucverify.c -lm
 make check      # needs the grader repository; UNCOMPUTE=/path/to/uncompute
+make check-caps # no fixed limits (part of make check; needs no grader repository)
 ```
 
 `make check` does three things:

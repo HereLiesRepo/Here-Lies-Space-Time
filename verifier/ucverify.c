@@ -28,6 +28,7 @@
  */
 #define _POSIX_C_SOURCE 200809L
 #include <inttypes.h>
+#include <limits.h>
 #include <math.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -67,6 +68,12 @@ static void *xrealloc(void *p, size_t n)
     void *q = realloc(p, n ? n : 1);
     if (!q) die("out of memory (%zu bytes)", n);
     return q;
+}
+
+static char *xstrdup(const char *s)
+{
+    size_t n = strlen(s) + 1;
+    return memcpy(xmalloc(n), s, n);
 }
 
 static int popc64(uint64_t x)
@@ -778,6 +785,8 @@ static uint32_t draw_new(Sim *s)
     } else {
         if (s->ndraw == s->capdraw) {
             s->capdraw = s->capdraw ? s->capdraw * 2 : 1024;
+            if ((size_t)s->capdraw > SIZE_MAX / 8u / (size_t)s->W)
+                die("draw table (%" PRIu32 " draws x %d words) exceeds this build's address space", s->capdraw, s->W);
             s->res = xrealloc(s->res, (size_t)s->capdraw * (size_t)s->W * 8u);
             s->refc = xrealloc(s->refc, (size_t)s->capdraw * 4u);
             s->freel = xrealloc(s->freel, (size_t)s->capdraw * 4u);
@@ -983,18 +992,32 @@ static void sim_items(Sim *s, const uint64_t *list, uint64_t n, int depth, uint6
 
 /* ------------------------------------------------------------- adapters */
 
-#define MAXREG 512
-
+/* Register arrays are sized from the task's register count (schema_alloc),
+ * so any number of registers is handled. */
 typedef struct {
     int nregs;
-    uint32_t width[MAXREG];
-    uint8_t kind[MAXREG];
-    uint64_t band[MAXREG]; /* centered band on the expected value (widths <= 64) */
+    uint32_t *width;
+    uint8_t *kind;
+    uint64_t *band; /* centered band on the expected value (widths <= 64) */
 } Schema;
 
+static void schema_alloc(Schema *sc, int nregs)
+{
+    sc->nregs = nregs;
+    sc->width = xcalloc((size_t)nregs, sizeof *sc->width);
+    sc->kind = xcalloc((size_t)nregs, sizeof *sc->kind);
+    sc->band = xcalloc((size_t)nregs, sizeof *sc->band);
+}
+
+static void schema_free(Schema *sc)
+{
+    free(sc->width); free(sc->kind); free(sc->band);
+    sc->width = NULL; sc->kind = NULL; sc->band = NULL;
+}
+
 typedef struct {
-    uint8_t has_in[MAXREG], has_exp[MAXREG];
-    uint8_t *in[MAXREG], *exp[MAXREG]; /* little-endian bytes */
+    uint8_t *has_in, *has_exp;
+    uint8_t **in, **exp; /* little-endian bytes */
     int exp_phase;
 } TC;
 
@@ -1029,13 +1052,13 @@ static void le_put(uint8_t *b, uint32_t width, uint64_t v)
 typedef struct {
     int id; /* 0 zero, 1 ones, 2 xormix, 3 splitmix, 4 kneg, 5 random */
     uint64_t seed;
-    char text[64];
+    char *text; /* the pattern as given, whole */
 } KMode;
 
 static int kmode_parse(const char *t, KMode *m)
 {
     memset(m, 0, sizeof *m);
-    snprintf(m->text, sizeof m->text, "%s", t);
+    m->text = xstrdup(t);
     if (!strcmp(t, "zero")) m->id = 0;
     else if (!strcmp(t, "ones")) m->id = 1;
     else if (!strcmp(t, "xormix")) m->id = 2;
@@ -1226,7 +1249,7 @@ static void vec_desc(Adapter *a, uint64_t lane, const TC *tc, uint8_t *const *rd
     for (r = 0; r < a->sc.nregs; r++) {
         if (!tc->has_exp[r]) continue;
         if (memcmp(rd[r], tc->exp[r], (a->sc.width[r] + 7u) / 8u)) {
-            if (nbad++ < 8) fprintf(f, "%s%d", nbad > 1 ? "," : "", r);
+            fprintf(f, "%s%d", nbad++ ? "," : "", r);
         }
     }
     fprintf(f, "]");
@@ -1263,8 +1286,10 @@ static void load_vectors(Adapter *a, const char *path)
     {
         uint64_t nr;
         VGET(4, nr);
-        if (nr > MAXREG) die("too many registers");
-        a->sc.nregs = (int)nr;
+        /* each register declares 13 bytes: bound the count by the file
+         * before allocating (int is the type of the register index) */
+        if (nr > (c->len - pos) / 13u || nr > (uint64_t)INT_MAX) die("%s: truncated (%" PRIu64 " registers declared)", path, nr);
+        schema_alloc(&a->sc, (int)nr);
     }
     for (r = 0; r < a->sc.nregs; r++) {
         uint64_t w, k, b;
@@ -1339,7 +1364,7 @@ static void run_check(const Prog *p, const Census *cs, Adapter *a, int W, int li
     Sim s;
     TC tc;
     uint64_t L = (uint64_t)W * 64u, base, idx[MAX_DEPTH + 1];
-    uint8_t *rd[MAXREG];
+    uint8_t **rd;
     uint8_t *isreg_q;
     uint64_t *dirtyw;
     int r;
@@ -1383,6 +1408,12 @@ static void run_check(const Prog *p, const Census *cs, Adapter *a, int W, int li
     for (r = 0; r < (int)p->nregs; r++)
         if (p->regs[r].kind == 0)
             for (i = 0; i < p->regs[r].nw; i++) isreg_q[p->regs[r].w[i]] = 1;
+    rd = xcalloc((size_t)a->sc.nregs, sizeof *rd);
+    tc.has_in = xcalloc((size_t)a->sc.nregs, 1);
+    tc.has_exp = xcalloc((size_t)a->sc.nregs, 1);
+    tc.in = xcalloc((size_t)a->sc.nregs, sizeof *tc.in);
+    tc.exp = xcalloc((size_t)a->sc.nregs, sizeof *tc.exp);
+    tc.exp_phase = 0;
     for (r = 0; r < a->sc.nregs; r++) {
         size_t nb = (a->sc.width[r] + 7u) / 8u + 8u;
         tc.in[r] = xcalloc(nb, 1);
@@ -1408,8 +1439,8 @@ static void run_check(const Prog *p, const Census *cs, Adapter *a, int W, int li
         for (l = 0; l < n; l++) {
             uint64_t bit = 1ull << (l & 63u);
             size_t wd = (size_t)(l >> 6);
-            memset(tc.has_in, 0, sizeof tc.has_in);
-            memset(tc.has_exp, 0, sizeof tc.has_exp);
+            memset(tc.has_in, 0, (size_t)a->sc.nregs);
+            memset(tc.has_exp, 0, (size_t)a->sc.nregs);
             if (!a->gen(a, base + l, &tc)) continue;
             s.live[wd] |= bit;
             for (r = 0; r < a->sc.nregs; r++) {
@@ -1454,8 +1485,8 @@ static void run_check(const Prog *p, const Census *cs, Adapter *a, int W, int li
             res->lanes++;
             if (!(s.live[wd] & bit)) continue;
             res->live++;
-            memset(tc.has_in, 0, sizeof tc.has_in);
-            memset(tc.has_exp, 0, sizeof tc.has_exp);
+            memset(tc.has_in, 0, (size_t)a->sc.nregs);
+            memset(tc.has_exp, 0, (size_t)a->sc.nregs);
             a->gen(a, base + l, &tc);
             for (r = 0; r < a->sc.nregs; r++) {
                 const Reg *R = &p->regs[r];
@@ -1503,6 +1534,7 @@ static void run_check(const Prog *p, const Census *cs, Adapter *a, int W, int li
         if (s.slot[i].cap) free(s.slot[i].v);
     free(s.slot); free(s.res); free(s.refc); free(s.freel); free(isreg_q); free(dirtyw);
     for (r = 0; r < a->sc.nregs; r++) { free(tc.in[r]); free(tc.exp[r]); free(rd[r]); }
+    free(rd); free(tc.has_in); free(tc.has_exp); free(tc.in); free(tc.exp);
 }
 
 /* ------------------------------------------------------------------ main */
@@ -1543,10 +1575,11 @@ static void print_metrics(const Prog *p, const Census *c)
 _Noreturn static void usage(void);
 static int ref_main(int argc, char **argv)
 {
-    char line[512];
+    char *line = NULL; /* grown by getline to the longest line read */
+    size_t linecap = 0;
     int bad = 0;
     if (argc < 3) usage();
-    while (fgets(line, sizeof line, stdin)) {
+    while (getline(&line, &linecap, stdin) != -1) {
         if (!strcmp(argv[2], "hhl-angle")) {
             unsigned long long X, k, ko;
             long double fl;
@@ -1585,6 +1618,7 @@ static int ref_main(int argc, char **argv)
             die("ref: unsupported task %s", argv[2]);
         }
     }
+    free(line);
     return bad;
 }
 
@@ -1616,9 +1650,10 @@ int main(int argc, char **argv)
     Prog P;
     Census C;
     const char *task, *path;
-    KMode modes[64];
-    int nmodes = 0, strict = 0, W = 512, list_max = 32, sample = 0, sweep = 0, nri = 0, ai, drop_kind = -1;
-    uint8_t ris[16][3];
+    /* --k patterns and --ri points: as many as are given (grown on need) */
+    KMode *modes = NULL;
+    int nmodes = 0, capmodes = 0, strict = 0, W = 512, list_max = 32, sample = 0, sweep = 0, nri = 0, capri = 0, ai, drop_kind = -1;
+    uint8_t (*ris)[3] = NULL;
     uint64_t lanes = 0, seed = 1, drop_nth = 0;
     int any_fail = 0, mi, ri;
 
@@ -1648,32 +1683,39 @@ int main(int argc, char **argv)
         if (!v) usage();
         ai++;
         if (!strcmp(o, "--k")) {
-            if (nmodes == 64 || kmode_parse(v, &modes[nmodes++])) die("bad --k %s", v);
+            GROW(modes, nmodes, capmodes);
+            if (kmode_parse(v, &modes[nmodes++])) die("bad --k %s", v);
         } else if (!strcmp(o, "--ri")) {
             unsigned a0, a1, a2;
-            if (nri == 16 || sscanf(v, "%u,%u,%u", &a0, &a1, &a2) != 3 || a0 > 255 || a1 > 255 || a2 > 255)
+            if (sscanf(v, "%u,%u,%u", &a0, &a1, &a2) != 3 || a0 > 255 || a1 > 255 || a2 > 255)
                 die("bad --ri %s", v);
+            GROW(ris, nri, capri);
             ris[nri][0] = (uint8_t)a0; ris[nri][1] = (uint8_t)a1; ris[nri][2] = (uint8_t)a2;
             nri++;
         } else if (!strcmp(o, "--lanes")) lanes = strtoull(v, NULL, 0);
         else if (!strcmp(o, "--seed")) seed = strtoull(v, NULL, 0);
-        else if (!strcmp(o, "--words")) W = atoi(v);
+        else if (!strcmp(o, "--words")) {
+            /* any positive count that fits the int it is stored in; the
+             * state allocation below checks the address space */
+            char *e;
+            long w = strtol(v, &e, 0);
+            if (*e || w < 1 || w > INT_MAX) die("bad --words %s", v);
+            W = (int)w;
+        }
         else if (!strcmp(o, "--list")) list_max = atoi(v);
         else if (!strcmp(o, "--drop")) {
-            char kn[32];
             const char *c = strchr(v, ':');
+            size_t kl;
             int k;
-            if (!c || (size_t)(c - v) >= sizeof kn) die("bad --drop %s", v);
-            memcpy(kn, v, (size_t)(c - v));
-            kn[c - v] = 0;
+            if (!c) die("bad --drop %s", v);
+            kl = (size_t)(c - v);
             for (k = 0; k < K_NKINDS; k++)
-                if (!strcmp(kn, KIND_NAME[k])) break;
-            if (k == K_NKINDS) die("bad --drop kind %s", kn);
+                if (strlen(KIND_NAME[k]) == kl && !strncmp(v, KIND_NAME[k], kl)) break;
+            if (k == K_NKINDS) die("bad --drop kind %.*s", (int)kl, v);
             drop_kind = k;
             drop_nth = strtoull(c + 1, NULL, 0);
         } else usage();
     }
-    if (W < 1 || W > 65536) die("bad --words");
     if (nmodes == 0 && strict) {
         /* the strict suite: the structured patterns, four independent
          * uniform-k seeds, and carry-boundary patterns k* = D for
@@ -1683,23 +1725,25 @@ int main(int argc, char **argv)
         uint32_t width = !strcmp(task, "coulomb-potential") ? 25u : !strcmp(task, "gaussian") ? 39u : 33u;
         uint32_t j, j0 = width - (!strcmp(task, "coulomb-potential") ? 8u : 17u);
         char t[64];
-        for (mi = 0; mi < 10; mi++) kmode_parse(def[mi], &modes[nmodes++]);
-        for (j = j0; j <= width && nmodes + 2 <= 64; j++) {
+        for (mi = 0; mi < 10; mi++) { GROW(modes, nmodes, capmodes); kmode_parse(def[mi], &modes[nmodes++]); }
+        for (j = j0; j <= width; j++) {
             snprintf(t, sizeof t, "kneg:%" PRIu64, (((uint64_t)1) << j) - 1u);
+            GROW(modes, nmodes, capmodes);
             kmode_parse(t, &modes[nmodes++]);
             if (j < width) {
                 snprintf(t, sizeof t, "kneg:%" PRIu64, ((uint64_t)1) << j);
+                GROW(modes, nmodes, capmodes);
                 kmode_parse(t, &modes[nmodes++]);
             }
         }
     }
     if (nmodes == 0) {
         const char *def[] = {"zero", "ones", "xormix", "splitmix:1", "splitmix:5"};
-        for (mi = 0; mi < 5; mi++) kmode_parse(def[mi], &modes[nmodes++]);
+        for (mi = 0; mi < 5; mi++) { GROW(modes, nmodes, capmodes); kmode_parse(def[mi], &modes[nmodes++]); }
     }
     if (nri == 0) {
         static const uint8_t dri[4][3] = {{0, 0, 0}, {255, 255, 255}, {128, 128, 128}, {0, 255, 128}};
-        for (ri = 0; ri < 4; ri++) memcpy(ris[nri++], dri[ri], 3);
+        for (ri = 0; ri < 4; ri++) { GROW(ris, nri, capri); memcpy(ris[nri++], dri[ri], 3); }
     }
 
     read_stream(&P, path);
@@ -1738,7 +1782,7 @@ int main(int argc, char **argv)
                     hc.sampled = sample;
                     hc.seed = seed;
                     a.name = task;
-                    a.sc.nregs = 2;
+                    schema_alloc(&a.sc, 2);
                     a.sc.width[0] = 21; a.sc.width[1] = 33;
                     a.sc.band[1] = 429;
                     a.n_lanes = sample ? (lanes ? lanes : 1u << 20) : 2031616u;
@@ -1748,7 +1792,7 @@ int main(int argc, char **argv)
                     cc.km = modes[mi];
                     memcpy(cc.ri, ris[ri], 3);
                     a.name = task;
-                    a.sc.nregs = 7;
+                    schema_alloc(&a.sc, 7);
                     for (r = 0; r < 6; r++) a.sc.width[r] = 8;
                     a.sc.width[6] = 25;
                     a.sc.band[6] = 32;
@@ -1759,7 +1803,7 @@ int main(int argc, char **argv)
                     gc.seed = seed;
                     gc.sweep = sweep;
                     a.name = task;
-                    a.sc.nregs = 2;
+                    schema_alloc(&a.sc, 2);
                     a.sc.width[0] = 39; a.sc.width[1] = 39;
                     a.sc.band[1] = 429;
                     a.n_lanes = lanes ? lanes : 1u << 22;
@@ -1778,6 +1822,7 @@ int main(int argc, char **argv)
                        R.dirty_lanes, R.dirty_qubits, R.failed);
                 fflush(stdout);
                 free(R.dirty_q);
+                schema_free(&a.sc);
                 any_fail |= R.failed != 0;
             }
         }

@@ -3,6 +3,7 @@
 #   make                build ucverify
 #   make check          cross-check counts against the published numbers and
 #                       run the negative controls (needs UNCOMPUTE)
+#   make check-caps     prove ucverify has no fixed limits (no UNCOMPUTE needed)
 #   make check STORE=d  also cross-check every d/**/stream.ops.xz against the
 #                       grade.json beside it
 #   make reproduce REPRO_CARRY30=f REPRO_BLIP=g   list the reproducers' failing lanes under the default k patterns (ucverify check ... --strict lists all)
@@ -24,8 +25,13 @@ ucverify: ucverify.c
 # the number after "FIELD": in a JSON line (a trailing .0 is dropped)
 field = sed -n 's/.*"$(1)": \([0-9.]*\).*/\1/p' | head -1 | sed 's/\.0$$//'
 
-check: ucverify check-counts check-store check-negative
+check: ucverify check-caps check-counts check-store check-negative
 	@echo "make check: all checks passed"
+
+# 0. no fixed limits: registers, k patterns, r_i points, words, line length
+#    (needs no grader repository; fails if any of those limits comes back)
+check-caps: ucverify
+	@sh caps_court.sh ./ucverify
 
 # 1. T/Q/TQ of every paper circuit equals its certified row in results.jsonl
 check-counts: ucverify
@@ -83,4 +89,4 @@ reproduce: ucverify
 clean:
 	rm -f ucverify tmp_neg.txt
 
-.PHONY: check check-counts check-store check-negative reproduce clean
+.PHONY: check check-caps check-counts check-store check-negative reproduce clean
