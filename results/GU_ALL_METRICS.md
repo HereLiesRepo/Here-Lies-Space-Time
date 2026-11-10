@@ -28,7 +28,7 @@ Paper = discovered circuit as printed in the paper (rounded where the paper roun
 | dqi-hermitian | qubits | 2,395 | 2,328 | BEATEN (authors' grader) | |
 | dqi-hermitian | failed shots (of 100,000) | 30 (paper text) | 59 | OPEN | ours is worse; limit is 100 |
 | dqi-reed-solomon | Toffoli | 442,397 | 442,043 | BEATEN (authors' grader) | margin 0.08% |
-| dqi-reed-solomon | qubits | 1,837 | 1,837 | OPEN | tie, not beaten |
+| dqi-reed-solomon | qubits | 1,837 | 1,837 | OPEN | tie, not beaten. Tried (GU-S3, branch `claude/gu-slice-rs-qubits` @1d525a1): free the top wire 1836 (non-register, 113,869 touches, one R at T=193,916,231, never measured; span T=14,285,372..193,916,231). Of the 495 non-register wires below it untouched in that window, none is provably zero at window start (each last touched by CX/CZ/X/Z/SWAP, not R/HMR), so no proven relocation exists; no edit made |
 | dqi-reed-solomon | failed shots | 7 (paper text) | 8 | OPEN | ours is worse; limit is 100 |
 | lattice-gauge-plaquette | Toffoli | 172,128 | 152,832 | BEATEN (authors' grader) | |
 | lattice-gauge-plaquette | qubits | 1,859 | 1,850 | BEATEN (authors' grader) | |
