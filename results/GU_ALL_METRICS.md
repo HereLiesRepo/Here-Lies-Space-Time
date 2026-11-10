@@ -29,7 +29,7 @@ Paper = discovered circuit as printed in the paper (rounded where the paper roun
 | dqi-hermitian | failed shots (of 100,000) | 30 (paper text) | 59 | OPEN | ours is worse; limit is 100 |
 | dqi-reed-solomon | Toffoli | 442,397 | 442,043 | BEATEN (authors' grader) | margin 0.08% |
 | dqi-reed-solomon | qubits | 1,837 | 1,837 | OPEN | tie, not beaten. Tried (GU-S3, branch `claude/gu-slice-rs-qubits` @1d525a1): free the top wire 1836 (non-register, 113,869 touches, one R at T=193,916,231, never measured; span T=14,285,372..193,916,231). Of the 495 non-register wires below it untouched in that window, none is provably zero at window start (each last touched by CX/CZ/X/Z/SWAP, not R/HMR), so no proven relocation exists; no edit made |
-| dqi-reed-solomon | failed shots | 7 (paper text) | 8 | OPEN | ours is worse; limit is 100 |
+| dqi-reed-solomon | failed shots | 7 (paper text) | 8 (committed circuit); 9 (Clifford candidate) | OPEN | ours is worse on both; limit is 100 |
 | lattice-gauge-plaquette | Toffoli | 172,128 | 152,832 | BEATEN (authors' grader) | |
 | lattice-gauge-plaquette | qubits | 1,859 | 1,850 | BEATEN (authors' grader) | |
 | modinv-point-add | Toffoli | 4,006,673 | 999,283 | BEATEN (authors' grader) | 4.0x fewer than the paper's divsteps circuit; 7/20 failures allowed |
@@ -40,11 +40,11 @@ Paper = discovered circuit as printed in the paper (rounded where the paper roun
 | coulomb-potential | Clifford | 7,253 | 7,224 | BEATEN (authors' grader) | `candidates/coulomb-potential/stream.ops.xz` (Toffoli 1,012, qubits 139 unchanged; 107 adjacent CX/CZ pairs cancelled). Receipt: `candidates/coulomb-potential/grade.json` (verbatim, uncompute@64b5a13, OK, 9,011 shots, 0 failures) and `GRADE_PROVENANCE.txt`; second check: release `ucverify check` PASS. The committed `circuits/coulomb-potential` stream stays the TQ record |
 | chemistry-fe2s2 | Clifford | 287,994 | 268,448 | BEATEN (authors' grader) | |
 | dqi-hermitian | Clifford | 437,084,323 | 397,303,604 | BEATEN (authors' grader) | |
-| dqi-reed-solomon | Clifford | 124,823,679 | 124,823,890 | OPEN | ours is 211 higher |
+| dqi-reed-solomon | Clifford | 124,823,679 | 124,209,420 | BEATEN (authors' grader) | `candidates/dqi-reed-solomon/stream.ops.xz` (Toffoli 442,043, qubits 1,837 unchanged; 307,235 adjacent identical CX/CZ/SWAP pairs deleted, `NOTE.md`). Receipt: `grade.json` verbatim (uncompute@64b5a13, C kernel, 100,000 shots, verdict OK). Trade-off: failed shots 9 (budget 100) vs 8 for the committed circuit. No second checker was run on this stream |
 | lattice-gauge-plaquette | Clifford | 1,885,109 | 1,761,621 | BEATEN (authors' grader) | |
 | modinv-point-add | Clifford | 15,391,673 | 14,882,638 | BEATEN (authors' grader) | vs the paper divsteps circuit; other family members range 12.1M-23.7M (the 3.29M-Toffoli `wide` variant has 12,074,853, lower than ours) |
 
-Counts: BEATEN 21 (authors' grader only; no stricter-grader or master re-grade receipts yet), BOUND 0, OPEN 8.
+Counts: BEATEN 22 (authors' grader only; no stricter-grader or master re-grade receipts yet), BOUND 0, OPEN 7.
 
 ## What is blocked
 - Fast-verifier runs: the C verifier in HereLiesRepo/witchcraft (`tools/state_tournament/ucverify`) was compiled but running it was denied by the classifier; nothing from it is used here.
