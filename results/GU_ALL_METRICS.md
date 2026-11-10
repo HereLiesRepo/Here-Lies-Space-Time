@@ -37,14 +37,14 @@ Paper = discovered circuit as printed in the paper (rounded where the paper roun
 | modinv-point-add | Toffoli vs Schrottenloher (1.9M, 1,446 Q) | 1.9e6 | 999,283 | OPEN | Schrottenloher is not a circuit committed here or graded here |
 | all 8 | TQ-cost | see README | see README | BEATEN (authors' grader) | the original claim; not recounted |
 | gaussian | Clifford | 29,878 | 26,095 | BEATEN (authors' grader) | paper figure: `upstream_grades/` (official results.jsonl @64b5a13) |
-| coulomb-potential | Clifford | 7,253 | 7,438 | OPEN | ours is 185 higher |
+| coulomb-potential | Clifford | 7,253 | 7,224 | BEATEN (authors' grader, relayed) | `candidates/coulomb-potential/stream.ops.xz` (Toffoli 1,012, qubits 139 unchanged; 107 adjacent CX/CZ pairs cancelled). Official grade OK relayed by the master, `receipts/coulomb-potential-clifford.md`; verbatim grade.json still to be committed. The committed `circuits/coulomb-potential` stream stays the TQ record |
 | chemistry-fe2s2 | Clifford | 287,994 | 268,448 | BEATEN (authors' grader) | |
 | dqi-hermitian | Clifford | 437,084,323 | 397,303,604 | BEATEN (authors' grader) | |
 | dqi-reed-solomon | Clifford | 124,823,679 | 124,823,890 | OPEN | ours is 211 higher |
 | lattice-gauge-plaquette | Clifford | 1,885,109 | 1,761,621 | BEATEN (authors' grader) | |
 | modinv-point-add | Clifford | 15,391,673 | 14,882,638 | BEATEN (authors' grader) | vs the paper divsteps circuit; other family members range 12.1M-23.7M (the 3.29M-Toffoli `wide` variant has 12,074,853, lower than ours) |
 
-Counts: BEATEN 20 (authors' grader only; no stricter-grader or master re-grade receipts yet), BOUND 0, OPEN 9.
+Counts: BEATEN 21 (authors' grader only; no stricter-grader or master re-grade receipts yet), BOUND 0, OPEN 8.
 
 ## What is blocked
 - Fast-verifier runs: the C verifier in HereLiesRepo/witchcraft (`tools/state_tournament/ucverify`) was compiled but running it was denied by the classifier; nothing from it is used here.
