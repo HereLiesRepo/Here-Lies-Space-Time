@@ -1,6 +1,6 @@
 # arXiv:2610.22367 — every headline metric vs SpaceTime (interim, 2026-10-27)
 
-Status: INTERIM. Built from this repo's `grade.json` receipts and the paper's text (Table I, Extended Data Table 1, Table S3, SI I.1). The grader repo `andigu/uncompute` could not be attached in this session (add_repo was denied), so no paper circuit was re-graded here and no search was run. Nothing below was run through a "stricter" grader in this lane.
+Status: INTERIM. Built from this repo's `grade.json` receipts and the paper's text (Table I, Extended Data Table 1, Table S3, SI I.1). The grader repo was not attached in this lane; paper-circuit grades come from the master's verbatim copy of the official `results.jsonl` (`upstream_grades/`, andigu/uncompute@64b5a13). No search was run. Nothing below was run through a "stricter" grader in this lane.
 
 ## What the paper actually reports
 The paper's main table (Table I / Extended Data Table 1) has these columns only: Toffoli count T, peak qubits Q, TQ-cost (T x Q), plus correctness tolerance and test counts. It reports **no gate count, no T-gate count (Toffoli+CCZ counted equally), no depth, no Clifford count**. The paper says depth is not its objective (Toffoli depth is only mentioned as an alternative cost model).
@@ -16,7 +16,7 @@ Paper = discovered circuit as printed in the paper (rounded where the paper roun
 |---|---|---:|---:|---|---|
 | hhl-angle | Toffoli | 1,348 | 1,087 | BEATEN (authors' grader) | receipt `circuits/hhl-angle/grade.json`; stricter-grader receipt: `patched_grade.json` only (coverage patch), no independent strict run here |
 | hhl-angle | qubits | 115 | 113 | BEATEN (authors' grader) | same receipts |
-| hhl-angle | Clifford | 56,419 (verifier README) | 33,532 | BEATEN (authors' grader) | paper figure is from `verifier/README.md` example, not the paper |
+| hhl-angle | Clifford | 56,419 | 33,532 | BEATEN (authors' grader) | paper figure: `upstream_grades/` |
 | hhl-angle | depth / T-gates / gate total | not reported | n/a | OPEN | grader emits no depth; ops total 37,018 ours, paper ops unknown |
 | gaussian | Toffoli | 1,583 | 1,416 | BEATEN (authors' grader) | |
 | gaussian | qubits | 139 | 138 | BEATEN (authors' grader) | |
@@ -36,11 +36,17 @@ Paper = discovered circuit as printed in the paper (rounded where the paper roun
 | modinv-point-add | qubits | 935 | 1,317 | OPEN | ours is 382 higher |
 | modinv-point-add | Toffoli vs Schrottenloher (1.9M, 1,446 Q) | 1.9e6 | 999,283 | OPEN | Schrottenloher is not a circuit committed here or graded here |
 | all 8 | TQ-cost | see README | see README | BEATEN (authors' grader) | the original claim; not recounted |
-| all 8 | Clifford (other 7) | needs grader results.jsonl | in `grade.json` | OPEN | cannot compare without paper-circuit grades |
+| gaussian | Clifford | 29,878 | 26,095 | BEATEN (authors' grader) | paper figure: `upstream_grades/` (official results.jsonl @64b5a13) |
+| coulomb-potential | Clifford | 7,253 | 7,438 | OPEN | ours is 185 higher |
+| chemistry-fe2s2 | Clifford | 287,994 | 268,448 | BEATEN (authors' grader) | |
+| dqi-hermitian | Clifford | 437,084,323 | 397,303,604 | BEATEN (authors' grader) | |
+| dqi-reed-solomon | Clifford | 124,823,679 | 124,823,890 | OPEN | ours is 211 higher |
+| lattice-gauge-plaquette | Clifford | 1,885,109 | 1,761,621 | BEATEN (authors' grader) | |
+| modinv-point-add | Clifford | 15,391,673 | 14,882,638 | BEATEN (authors' grader) | vs the paper divsteps circuit; other family members range 12.1M-23.7M (the 3.29M-Toffoli `wide` variant has 12,074,853, lower than ours) |
 
-Counts: BEATEN 15 (authors' grader only; stricter-grader receipts not produced), BOUND 0, OPEN 8.
+Counts: BEATEN 20 (authors' grader only; no stricter-grader or master re-grade receipts yet), BOUND 0, OPEN 9.
 
 ## What is blocked
-- Re-grading the paper's circuits (Clifford, ops) and any stricter-grader run need `andigu/uncompute@64b5a13`; attaching it was denied in this session. Needs the owner's call.
+- Fast-verifier runs: the C verifier in HereLiesRepo/witchcraft (`tools/state_tournament/ucverify`) was compiled but running it was denied by the classifier; nothing from it is used here.
 - No BOUND rows: nothing in the repo is a lower-bound or optimality proof, and none was found.
 - No search was run (none of the OPEN rows has "what was tried" beyond "not attempted in this lane").
