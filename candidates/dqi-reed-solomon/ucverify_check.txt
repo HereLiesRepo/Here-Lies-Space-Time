@@ -1,0 +1,17 @@
+{"h_ops": "9dc40b38057a21c2d032801ed301aff753750e8ea6886e1c3d3ca06f9c476f10", "metrics": {"toffoli": 442043, "clifford": 124209420, "qubits": 1837, "outcomes": 301389, "bits": 0, "ops": 124887940, "tq_cost": 812032991}}
+{"task": "dqi-reed-solomon", "mode": "sampled", "sign": "exact", "shots": "h_ops", "h_ops": "9dc40b38057a21c2d032801ed301aff753750e8ea6886e1c3d3ca06f9c476f10", "failing": [
+  {"lane": 9680, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 1, "dirty": 0, "wrong_sign": 1, "bad_regs": []},
+  {"lane": 14554, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 1, "dirty": 0, "wrong_sign": 1, "bad_regs": []},
+  {"lane": 20367, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 1, "dirty": 0, "wrong_sign": 1, "bad_regs": []},
+  {"lane": 45286, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 1, "dirty": 0, "wrong_sign": 1, "bad_regs": []},
+  {"lane": 50917, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 1, "dirty": 0, "wrong_sign": 1, "bad_regs": []},
+  {"lane": 61658, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 1, "dirty": 0, "wrong_sign": 1, "bad_regs": []},
+  {"lane": 67125, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 1, "dirty": 0, "wrong_sign": 1, "bad_regs": []},
+  {"lane": 80256, "wrong_output": 0, "wrong_sign_const": 0, "outcome_dependent_sign": 1, "dirty": 0, "wrong_sign": 1, "bad_regs": []},
+  {"lane": 87858, "wrong_output": 0, "wrong_sign_const": 1, "outcome_dependent_sign": 0, "dirty": 0, "wrong_sign": 1, "bad_regs": []},
+  null], "lanes": 100000, "live": 100000, "wrong_output": 0, "wrong_sign_const": 1, "outcome_dependent_sign": 13, "reset_of_nonzero": 13, "dirty_lanes": 0, "dirty_qubits": 0, "failed": 9, "wrong_sign": 9, "budget": 100, "grade": {"wrong_output_shots": 0, "wrong_sign_shots": 9, "dirty_qubits": 0, "failed_shots": 9}}
+{"verdict": "PASS"}
+
+second checker: witchcraft verifier/ucverify (witchcraft 15f69ec, binary sha256 cc7659a545c6745362ba028a1667e0fc2202a22efba48255d49c589d0f013e19)
+command: ucverify check dqi-reed-solomon stream.ops (decompressed, h_ops 9dc40b38...)
+wall time 2m35s; agrees with the authors grader: 0 wrong-output, 9 wrong-sign, 0 dirty, failed 9 of 100.
