@@ -8,6 +8,8 @@
  * of a non-register wire that was touched before splits its interval. Register
  * qubit wires (segment 1, kind 0) are counted apart. The bound printed is
  * register wires + the peak number of concurrently live ancilla intervals.
+ * Loop nesting of any depth is taken: the loop-index array is sized from the
+ * stream (court: sh results/tools/liveness_court.sh).
  *
  * Credit: op-stream format from the uncompute evaluator, Gu, Kemeny, Yelin,
  * Lukin, arXiv:2610.22367, https://arxiv.org/abs/2610.22367, andigu/uncompute
@@ -73,11 +75,14 @@ static node *pop(int depth)
     return x;
 }
 
+static int maxdepth; /* deepest LOOP nesting seen; sizes the loop-index array */
+
 static node *ploop(int enc)
 {
     node *x = calloc(1, sizeof *x);
     int i;
     if (!x) die("out of memory");
+    if (enc + 1 > maxdepth) maxdepth = enc + 1;
     x->is_loop = 1; x->cnt = u(8); x->nch = (int)u(2);
     x->ch = calloc((size_t)x->nch + 1, sizeof *x->ch);
     if (!x->ch) die("out of memory");
@@ -162,7 +167,7 @@ int main(void)
 {
     size_t cap = 1 << 20, ntop = 0, topcap = 64, w, nreg = 0, touched = 0, maxid = 0, nanc, i, ne = 0;
     node **top = malloc(topcap * sizeof *top);
-    int64_t idx[64];
+    int64_t *idx;
     event *ev;
     long cur = 0, mx = 0;
     d = malloc(cap);
@@ -202,7 +207,11 @@ int main(void)
             die("unknown segment");
         }
     }
+    /* one index per nesting level, as deep as this stream nests */
+    idx = calloc((size_t)maxdepth + 1, sizeof *idx);
+    if (!idx) die("out of memory");
     for (i = 0; i < ntop; ++i) run(top[i], idx, 0);
+    free(idx);
     for (w = 0; w < wcap; ++w) {
         if (isreg[w]) ++nreg;
         if (seen[w]) { ++touched; maxid = w; }
