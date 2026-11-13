@@ -44,7 +44,7 @@ Paper = discovered circuit as printed in the paper (rounded where the paper roun
 | lattice-gauge-plaquette | Clifford | 1,885,109 | 1,761,621 | BEATEN (authors' grader) | |
 | modinv-point-add | Clifford | 15,391,673 | 14,882,638 | BEATEN (authors' grader) | vs the paper divsteps circuit; other family members range 12.1M-23.7M (the 3.29M-Toffoli `wide` variant has 12,074,853, lower than ours) |
 
-Counts: BEATEN 22 (authors' grader only; no stricter-grader or master re-grade receipts yet), BOUND 0, OPEN 7.
+Counts: BEATEN 22, BOUND 0, OPEN 7. Stricter-grader receipt (2026-11-13, `results/STRICT_GRADE_20261113.md`): our `ucverify check --strict` PASSES hhl-angle, gaussian and coulomb-potential; its independent `count` equals the Toffoli and qubit figures of all eight circuits; the other five tasks have no `ucverify` output adapter, so their grade still rests on the authors' grader receipts alone.
 
 ## What is blocked
 - Fast-verifier runs: the C verifier in HereLiesRepo/witchcraft (`tools/state_tournament/ucverify`) was compiled but running it was denied by the classifier; nothing from it is used here.
